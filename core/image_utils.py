@@ -89,8 +89,39 @@ def clean_tags(
 
     if enforce_strict:
         valid_set = load_danbooru_tags()
+        # Some critical structural Danbooru tags might be missing from the JSON
+        safe_core_tags = {
+            "1girl",
+            "2girls",
+            "3girls",
+            "4girls",
+            "5girls",
+            "6+girls",
+            "1boy",
+            "2boys",
+            "3boys",
+            "1other",
+            "solo",
+            "multiple girls",
+            "multiple boys",
+            "masterpiece",
+            "best quality",
+            "highres",
+            "absurdres",
+            "illustration",
+            "sketch",
+            "digital art",
+            "traditional media",
+            "anime",
+            "manga",
+            "realistic",
+            "photorealistic",
+        }
+
         if valid_set:
-            tags = [t for t in tags if t.lower() in valid_set]
+            tags = [
+                t for t in tags if t.lower() in valid_set or t.lower() in safe_core_tags
+            ]
 
     cleaned = ", ".join(tags)
     if cleaned and trailing_separator:
