@@ -53,7 +53,8 @@ htmlcov/
 
 # Local prompt files (keep in .gitignore to avoid large files in repo)
 *.txt
-
+!requirements.txt
+!LICENSE
 *.md
 !README.md
 task.md
