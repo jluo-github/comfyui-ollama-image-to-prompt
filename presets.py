@@ -15,16 +15,18 @@ DEFAULT_MODEL = "qwen3-vl:8b"
 DEFAULT_URL = "http://localhost:11434"
 
 TAGS_PROMPT = (
-    "You are an expert anime image tagger. Extract a comma-separated list of Danbooru-style tags from this image. "
-    "You MUST output ONLY a localized list of comma-separated tags. DO NOT write full sentences or paragraphs. "
-    "DO NOT use conversational filler like 'Here are the tags' or '**Prompt:**'.\n"
-    "Include up to 40 tags covering:\n"
-    "- Quality: masterpiece, best quality, highres\n"
-    "- Subject: 1girl, solo, hair color, eye color, hair style\n"
-    "- Attire & Action: clothing traits, pose\n"
-    "- Environment & Lighting: background, lighting style\n\n"
-    "Example Output:\n"
-    "1girl, solo, masterpiece, best quality, highres, black hair, ponytail, blue eyes, white crop top, denim shorts, platform boots, holding smartphone, soft lighting, minimal background"
+    "Extract a comma-separated list of Danbooru tags describing this image.\n"
+    "CRITICAL AXIOMS:\n"
+    "1. Format: comma-separated list ONLY. No sentences, no grammar, no structure.\n"
+    "2. NO markdown (`**`), NO prefixes (`Prompt:`), NO suffixes (`Enjoy!`, 🎨✨).\n\n"
+    "Categories to tag:\n"
+    "- Meta: masterpiece, best quality, highres\n"
+    "- Subject: 1girl, solo, dark hair, blue eyes, ponytail\n"
+    "- Clothing: crop top, shorts, boots, thighhighs\n"
+    "- Pose: holding smartphone, sitting, looking at viewer\n"
+    "- Setting & Lighting: simple background, cinematic lighting\n\n"
+    "OUTPUT FORMAT: tag1, tag2, tag3, ..., tag40\n"
+    "Begin output immediately with the first tag."
 )
 
 NATURAL_LANGUAGE_PROMPT = (
