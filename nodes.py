@@ -132,7 +132,7 @@ class OllamaImageToPrompt:
 
                 # Post-processing for tags mode
                 if mode == "tags" and not custom_prompt:
-                    generated_text = clean_tags(generated_text)
+                    generated_text = clean_tags(generated_text, enforce_strict=True)
 
                 generated_texts.append(generated_text)
                 thought_processes.append(thought_process)

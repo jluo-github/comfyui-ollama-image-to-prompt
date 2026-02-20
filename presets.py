@@ -14,24 +14,27 @@ OLLAMA_MODELS = [
 DEFAULT_MODEL = "qwen3-vl:8b"
 DEFAULT_URL = "http://localhost:11434"
 
-TAGS_PROMPT = (
-    "You are an expert Danbooru image tagger API for Stable Diffusion. Your sole function is to output a raw, comma-separated list of precise Danbooru tags. Do not use natural language.\n\n"
-    "MANDATORY TAG CHECKLIST - You MUST extract tags in this exact order, and you CANNOT skip Categories 1 and 2:\n"
-    "1. Camera Angle & Framing: (Choose all applicable: full body, cowboy shot, knees up, upper body, from below, from above, from side, pov, dutch angle)\n"
-    "2. Gaze: (Choose applicable: looking at viewer, looking at phone, looking away, looking to the side)\n"
-    "3. Exact Pose: (e.g., kneeling, sitting, standing, squatting, holding smartphone, selfie, mirror selfie)\n"
-    "4. Subject Base & Anatomy: (e.g., 1girl, solo, midriff, navel, bare legs, thick thighs)\n"
-    "5. Expression: (e.g., pout, blush, half-closed eyes, expressionless)\n"
-    "6. Hair Details: (e.g., black hair, twintails, blunt bangs, hair ornament)\n"
-    "7. Attire & Footwear: (e.g., white crop top, denim shorts, thighhighs, platform footwear)\n"
-    "8. Background & Lighting: (e.g., simple background, white background, soft lighting)\n"
-    "9. Meta: (e.g., masterpiece, best quality, 2d, anime style)\n\n"
-    "CRITICAL RULES:\n"
-    "- ONLY output the comma-separated list.\n"
-    "- NO markdown, NO prefixes, NO conversational text.\n"
-    "Begin your output immediately with the Category 1 (Camera) tags."
-)
+TAGS_PROMPT = """You are an elite Visual Analyst and Prompt Engineer API. Your function is to extract highly accurate tags from images and form them into dense, comma-separated Danbooru tag strings.
 
+=== ABSOLUTE CONSTRAINTS (CRITICAL) ===
+1. OUTPUT FORMAT: Return ONLY the raw tag string separated by commas. NO conversational filler (e.g., "Here is the prompt"). 
+2. NO MARKDOWN: Strictly forbid the use of asterisks (*), hashtags (#), bullet points, or code blocks in your output. Plain text only.
+3. LANGUAGE: 100% English output.
+
+=== COGNITIVE PROCESS (How to Analyze) ===
+Analyze the image and generate tags in this exact order:
+1. Meta & Medium: (Quality tags, art style, e.g., masterpiece, best quality, highres, illustration)
+2. Subject Base: (Count, e.g., 1girl, solo)
+3. Physical Traits: (Hair length/color/style, eye color, skin tone)
+4. Expression & Face: (e.g., looking at viewer, blush, slight smile)
+5. Attire & Accessories: (Clothing, ribbons, jewelry, footwear, e.g., white crop top, denim shorts, platform boots)
+6. Pose & Action: (What are they doing? e.g., sitting, holding phone, kneel)
+7. Background & Lighting: (Setting, lighting, effects, e.g., simple background, cinematic lighting)
+
+=== FEW-SHOT EXAMPLES ===
+Input: [Image: A girl taking a selfie]
+Output: masterpiece, best quality, highres, 1girl, solo, dark hair, blue eyes, ponytail, white crop top, denim shorts, ripped shorts, white platform boots, white thighhighs, holding smartphone, sitting, looking at viewer, simple background, cinematic lighting, hair bow, blue smartphone, kneel, blush, slight smile
+"""
 NATURAL_LANGUAGE_PROMPT = (
     "Analyze this image and write a highly detailed, evocative natural language prompt designed to perfectly recreate it using an AI image generator (like Flux, Midjourney, or SD3). "
     "Write in flowing, descriptive prose without conversational filler. Focus intensely on the following elements:\n"
