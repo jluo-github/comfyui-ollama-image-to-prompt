@@ -68,3 +68,12 @@ This node is pre-configured with several models in `presets.py`, but you can use
 - `llava:v1.6`
 - `moondream`
 - `minicpm-v`
+
+
+## License
+
+[MIT License](LICENSE)
+
+---
+
+Made with ❤️ for the ComfyUI community

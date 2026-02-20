@@ -15,18 +15,15 @@ DEFAULT_MODEL = "qwen3-vl:8b"
 DEFAULT_URL = "http://localhost:11434"
 
 TAGS_PROMPT = (
-    "Analyze this image and extract a highly detailed, comma-separated list of Danbooru-style tags to exactly mimic its aesthetic, style, and content. "
-    "Act as an expert AI image prompter for top-tier Civitai anime/illustration models. Be extremely exhaustive (60+ tags). "
-    "Structure your tag generation by prioritizing these categories:\n"
-    "1. QUALITY & META: Always include premium tags: masterpiece, best quality, very aesthetic, absurdres, highres. Include medium (anime artwork, official art, key visual, illustration).\n"
-    "2. SUBJECT: Character count (1girl, solo, etc.), hair (color, length, style, ahoge, twin braids, etc.), eyes (color, intricate detailed eyes), skin, body type.\n"
-    "3. EXPRESSION & FACE: Be hyper-specific. (e.g., looking at viewer, parted lips, blush, heavy eyeliner, detailed face, smug, crying, glowing eyes). Capture the exact emotion.\n"
-    "4. POSE & CAMERA: Angle (dutch angle, from below, dynamic angle, extreme close-up, cowboy shot). Pose (dynamic pose, contrapposto, reaching towards viewer, foreshortening, floating, sitting). Hand gestures (v sign, hands on hips, adjusting hair).\n"
-    "5. ATTIRE: Specific clothing (pleated skirt, mechanical armor, thighhighs), fabric texture (latex, wet clothes, translucent, metallic), details (frills, lace, belts, intricate clothing).\n"
-    "6. ENVIRONMENT: Setting (detailed background, cityscape, ruined ruins, outdoors, starry sky), props (holding sword, floating petals, chains).\n"
-    "7. ATMOSPHERE & LIGHTING: cinematic lighting, dramatic lighting, volumetric lighting, rim lighting, depth of field (dof), chromatic aberration, light particles, dust, god rays, bloom.\n"
-    "8. ART STYLE: Mimic the specific vibe and skill (intricate details, thick lines, pastel colors, retro artstyle, cel shading, impasto, masterpiece shading).\n"
-    "CRITICAL RULE: Output ONLY a single, continuous comma-separated string of tags. Do NOT use markdown formatting, bullet points, numbering, or conversational text. NO intro, NO outro."
+    "Analyze this image and extract a concise, highly accurate comma-separated list of Danbooru-style tags. "
+    "Focus ONLY on the most prominent and important elements:\n"
+    "1. Quality: masterpiece, best quality, highres.\n"
+    "2. Subject: Character traits (e.g., 1girl, solo), hair, eyes, expression.\n"
+    "3. Pose & Attire: Main action, camera angle, and primary clothing.\n"
+    "4. Environment: Background, key lighting, and overall style.\n"
+    "CRITICAL RULE: Output ONLY a single, continuous comma-separated string of tags. "
+    "Do NOT hallucinate or repeat tags. Limit to 30-40 tags maximum. "
+    "NO markdown formatting, NO conversational text, NO intro, NO outro."
 )
 
 NATURAL_LANGUAGE_PROMPT = (
