@@ -18,6 +18,9 @@ def tensor_to_base64(image: torch.Tensor) -> str:
     return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 
+import re
+
+
 def clean_tags(raw_text: str, trailing_separator: bool = True) -> str:
     """Cleans up raw model output into a comma-separated tag string.
 
@@ -28,7 +31,16 @@ def clean_tags(raw_text: str, trailing_separator: bool = True) -> str:
     Returns:
         A cleaned, comma-separated tag string.
     """
-    cleaned = raw_text.replace("\n", ", ").replace("- ", "")
+    # Strip common conversational prefixes and markdown
+    cleaned = re.sub(
+        r"(?i)^(here are.*?:|\*\*?tags:?\*\*?|\*\*?prompt:?\*\*?|prompt:)",
+        "",
+        raw_text.strip(),
+    )
+    # Remove quotes and asterisks
+    cleaned = cleaned.replace('"', "").replace("*", "")
+
+    cleaned = cleaned.replace("\n", ", ").replace("- ", "")
     cleaned = ", ".join([t.strip() for t in cleaned.split(",") if t.strip()])
     if cleaned and trailing_separator:
         cleaned += ", "
