@@ -60,4 +60,5 @@ htmlcov/
 task.md
 *artifact*.md
 *plan*.md
+*.json
 
