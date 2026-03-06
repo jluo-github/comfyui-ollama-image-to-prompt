@@ -42,7 +42,7 @@ class OllamaImageToPrompt:
                 "model": (OLLAMA_MODELS, {"default": DEFAULT_MODEL}),
                 "mode": (["natural_language", "tags"], {"default": "natural_language"}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xFFFFFFFFFFFFFFFF}),
-                "keep_alive": ("INT", {"default": 5, "min": -1, "max": 60, "step": 1}),
+                "keep_alive": ("INT", {"default": 0, "min": -1, "max": 60, "step": 1}),
                 "thinking_mode": ("BOOLEAN", {"default": False}),
                 "enable_thinking": ("BOOLEAN", {"default": True}),
             },

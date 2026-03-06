@@ -46,11 +46,29 @@ pip install -r requirements.txt
 
 Restart ComfyUI.
 
-## 💡 Usage Guide
+## 💡 Usage
 
-1. Search for the node **"Ollama Image to Prompt"** in the ComfyUI search menu.
-2. Connect your source `IMAGE` (supports both single images and batches).
-3. Connect the generated `text` output to a CLIP Text Encode node or your preferred conditioning system.
+1. Search for the node **"Ollama Image to Prompt"**.
+2. Connect an **IMAGE** input.
+3. Configure settings:
+   - **ollama_url**: URL of your Ollama instance (default: `http://localhost:11434`).
+   - **model**: Select the model you pulled (e.g., `qwen3-vl:8b`).
+   - **mode**: Choose between `natural_language` or `tags`.
+   - **thinking_mode**: Enable to extract internal chain-of-thought (if the model outputs `<think>` tags).
+4. Connect the **text** output to a CLIP Text Encode node or similar.
+
+### Inputs
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `image` | `IMAGE` | The source image(s) to be analyzed by the vision model. Supports batches. |
+
+### Outputs
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `text` | `STRING` | The generated prompt (either natural language description or tags). |
+| `thought_process` | `STRING` | The internal chain-of-thought extracted from the model (if applicable). |
 
 ### Configuration Node Parameters
 
@@ -60,7 +78,7 @@ Restart ComfyUI.
 | `model` | Dropdown | `qwen3-vl:8b` | Select the locally pulled VLM model. |
 | `mode` | Dropdown | `natural_language` | Choose between descriptive paragraphs or keyword `tags`. |
 | `seed` | Integer | `0` | Lock the seed for deterministic outputs during prompt engineering. |
-| `keep_alive` | Integer | `5` | Minutes to keep the model loaded in VRAM. Use `-1` for indefinite. |
+| `keep_alive` | Integer | `0` | Minutes to keep the model loaded in VRAM. Use `-1` for indefinite. |
 | `thinking_mode` | Toggle | `False` | Enable to parse and extract the model's internal reasoning from `<think>` tags. |
 | `enable_thinking` | Toggle | `True` | If set to `False`, completely skips generating reasoning logic by appending instructions to the prompt, drastically speeding up generation. |
 | `custom_prompt` | Text | *(Empty)* | Override the built-in system prompt. Leave empty to use the standard mode prompts. |
