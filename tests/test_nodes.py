@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from unittest.mock import MagicMock, patch
 
 import torch
@@ -44,7 +43,7 @@ class TestPromptSelection:
     def _make_batch(self, batch_size: int = 1) -> torch.Tensor:
         return torch.rand(batch_size, 4, 4, 3)
 
-    @patch("nodes.requests.post")
+    @patch("core.api.requests.post")
     def test_natural_language_mode(self, mock_post: MagicMock) -> None:
         mock_response = MagicMock()
         mock_response.json.return_value = {"response": "A beautiful scene."}
@@ -60,12 +59,13 @@ class TestPromptSelection:
             seed=42,
             keep_alive=5,
             thinking_mode=False,
+            enable_thinking=True,
         )
 
         assert len(texts) == 1
         assert texts[0] == "A beautiful scene."
 
-    @patch("nodes.requests.post")
+    @patch("core.api.requests.post")
     def test_tags_mode_cleans_output(self, mock_post: MagicMock) -> None:
         mock_response = MagicMock()
         mock_response.json.return_value = {"response": "- tag1\n- tag2\n- tag3"}
@@ -81,13 +81,14 @@ class TestPromptSelection:
             seed=42,
             keep_alive=5,
             thinking_mode=False,
+            enable_thinking=True,
         )
 
         assert "tag1" in texts[0]
         assert "\n" not in texts[0]
         assert texts[0].endswith(", ")
 
-    @patch("nodes.requests.post")
+    @patch("core.api.requests.post")
     def test_custom_prompt_overrides_mode(self, mock_post: MagicMock) -> None:
         mock_response = MagicMock()
         mock_response.json.return_value = {"response": "custom output"}
@@ -103,6 +104,7 @@ class TestPromptSelection:
             seed=0,
             keep_alive=5,
             thinking_mode=False,
+            enable_thinking=True,
             custom_prompt="My custom instruction",
         )
 
@@ -114,7 +116,7 @@ class TestThinkTagParsing:
     def _make_batch(self) -> torch.Tensor:
         return torch.rand(1, 4, 4, 3)
 
-    @patch("nodes.requests.post")
+    @patch("core.api.requests.post")
     def test_think_tags_extracted_when_enabled(self, mock_post: MagicMock) -> None:
         mock_response = MagicMock()
         mock_response.json.return_value = {
@@ -132,12 +134,13 @@ class TestThinkTagParsing:
             seed=0,
             keep_alive=5,
             thinking_mode=True,
+            enable_thinking=True,
         )
 
         assert texts[0] == "A girl with blue hair."
         assert thoughts[0] == "I need to analyze this."
 
-    @patch("nodes.requests.post")
+    @patch("core.api.requests.post")
     def test_think_tags_stripped_when_disabled(self, mock_post: MagicMock) -> None:
         mock_response = MagicMock()
         mock_response.json.return_value = {
@@ -155,14 +158,39 @@ class TestThinkTagParsing:
             seed=0,
             keep_alive=5,
             thinking_mode=False,
+            enable_thinking=True,
         )
 
         assert texts[0] == "Main output."
         assert thoughts[0] == ""
 
+    @patch("core.api.requests.post")
+    def test_disabled_thinking_modifies_prompt(self, mock_post: MagicMock) -> None:
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"response": "Direct answer."}
+        mock_response.raise_for_status = MagicMock()
+        mock_post.return_value = mock_response
+
+        node = OllamaImageToPrompt()
+        node.generate_prompt(
+            image=self._make_batch(),
+            ollama_url="http://localhost:11434",
+            model="qwen3-vl:8b",
+            mode="natural_language",
+            seed=0,
+            keep_alive=5,
+            thinking_mode=False,
+            enable_thinking=False,  # Set to False
+        )
+
+        # Assert that "Do not output any reasoning" was added to the payload prompt
+        call_kwargs = mock_post.call_args.kwargs
+        payload_prompt = call_kwargs["json"]["prompt"]
+        assert "Do not output any reasoning" in payload_prompt
+
 
 class TestBatchProcessing:
-    @patch("nodes.requests.post")
+    @patch("core.api.requests.post")
     def test_processes_multiple_images(self, mock_post: MagicMock) -> None:
         mock_response = MagicMock()
         mock_response.json.return_value = {"response": "Description."}
@@ -179,6 +207,7 @@ class TestBatchProcessing:
             seed=0,
             keep_alive=5,
             thinking_mode=False,
+            enable_thinking=True,
         )
 
         assert len(texts) == 3

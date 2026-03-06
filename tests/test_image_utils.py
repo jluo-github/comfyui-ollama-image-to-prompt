@@ -3,7 +3,6 @@ from __future__ import annotations
 import base64
 import io
 
-import numpy as np
 import torch
 from PIL import Image
 

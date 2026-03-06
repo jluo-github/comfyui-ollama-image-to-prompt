@@ -1,78 +1,77 @@
-# ComfyUI Ollama Image to Prompt
+<div align="center">
+  <h1>✨ ComfyUI Ollama Image to Prompt</h1>
+  <p><strong>A powerful, fully-local ComfyUI node that leverages Ollama vision models to generate high-fidelity image prompts and Danbooru-style tags.</strong></p>
 
-A custom node for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that leverages local [Ollama](https://ollama.com/) vision models to generate detailed prompts or Danbooru-style tags from images.
+  [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+  [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![Tests](https://github.com/jluo-github/comfyui-ollama-image-to-prompt/actions/workflows/tests.yml/badge.svg)](https://github.com/jluo-github/comfyui-ollama-image-to-prompt/actions)
+</div>
 
-## Features
+---
 
-- **Local Inference**: Runs entirely locally using Ollama.
-- **Batch Processing**: Supports batch processing of images (one prompt per image).
-- **Dual Modes**:
-  - `natural_language`: Generates detailed descriptive prompts.
-  - `tags`: Generates Danbooru-style tags (useful for training or tag-based models).
-- **Thinking Process**: Captures "thought process" from reasoning models like qwen3-vl (if available/supported by the model artifact).
-- **Custom Prompts**: Full control over the system prompt if needed.
+## 🌟 Overview
 
-## Installation
+The **Ollama Image to Prompt** custom node brings the power of open-weight Vision-Language Models (VLMs) directly into your ComfyUI workflow. It connects to your local Ollama instance to analyze images and generate highly detailed prompts, making it perfect for image-to-image workflows, dataset curation, and creative exploration.
 
-1. **Install Ollama**: Download and install from [ollama.com](https://ollama.com/).
-2. **Pull a Vision Model**:
+## 🚀 Key Features
+
+*   🔒 **100% Local Privacy**: Runs entirely on your hardware via Ollama. No cloud dependencies.
+*   ⚡ **Batch Processing Support**: Seamlessly processes batches of images, generating independent prompts for each frame.
+*   🧠 **Dual Generation Modes**:
+    *   `natural_language`: Crafts evocative, flowing, highly detailed descriptive paragraphs.
+    *   `tags`: Generates precise, comma-separated Danbooru-style tags.
+*   💭 **Chain-of-Thought Parsing**: Extracts the hidden `<think>` blocks from reasoning models (like `qwen3-vl`) to show you the model's internal logic.
+
+## 📦 Installation
+
+This node relies on [Ollama](https://ollama.com/) to perform the heavy lifting. 
+
+### 1. Set Up Ollama
+1. Download and install Ollama from [ollama.com](https://ollama.com/).
+2. Pull a vision-capable model. We highly recommend **Qwen3-VL** for its exceptional spatial awareness.
    ```bash
    ollama pull qwen3-vl:8b
    ```
-3. **Clone this Repository**:
-   Navigate to your ComfyUI `custom_nodes` directory:
-   ```bash
-   cd ComfyUI/custom_nodes/
-   git clone https://github.com/jluo-github/comfyui-ollama-image-to-prompt.git
-   ```
-4. **Install Requirements**:
-   ```bash
-   pip install -r requirements.txt
-   ```
 
-## Usage
+### 2. Install the Custom Node
+Navigate to your ComfyUI `custom_nodes` directory and clone the repository:
 
-1. Search for the node **"Ollama Image to Prompt"**.
-2. Connect an **IMAGE** input.
-3. Configure settings:
-   - **ollama_url**: URL of your Ollama instance (default: `http://localhost:11434`).
-   - **model**: Select the model you pulled (e.g., `qwen3-vl:8b`).
-   - **mode**: Choose between `natural_language` or `tags`.
-   - **thinking_mode**: Enable to extract internal chain-of-thought (if the model outputs `<think>` tags).
-4. Connect the **text** output to a CLIP Text Encode node or similar.
+```bash
+cd ComfyUI/custom_nodes/
+git clone https://github.com/jluo-github/comfyui-ollama-image-to-prompt.git
+cd comfyui-ollama-image-to-prompt
+pip install -r requirements.txt
+```
 
-## Inputs
+Restart ComfyUI.
 
-| Input | Type | Description |
-| :--- | :--- | :--- |
-| **image** | IMAGE | The input image(s) to analyze. |
-| **ollama_url** | STRING | The API endpoint for Ollama. Default: `http://localhost:11434` |
-| **model** | LIST | The vision model to use (e.g., `qwen3-vl:8b`). |
-| **mode** | LIST | `natural_language` (descriptive) or `tags` (keyword list). |
-| **seed** | INT | Seed for deterministic generation. |
-| **keep_alive** | INT | How long to keep the model loaded in memory (in minutes). |
-| **thinking_mode** | BOOLEAN | If true, enables parsing of `<think>` tags. |
-| **custom_prompt** | STRING | (Optional) Override the default prompts with your own. |
+## 💡 Usage Guide
 
-## Outputs
+1. Search for the node **"Ollama Image to Prompt"** in the ComfyUI search menu.
+2. Connect your source `IMAGE` (supports both single images and batches).
+3. Connect the generated `text` output to a CLIP Text Encode node or your preferred conditioning system.
 
-- **text**: The generated description or tags.
-- **thought_process**: The internal reasoning chain text (if `thinking_mode` is enabled and supported by the model).
+### Configuration Node Parameters
 
-## Supported Models (Examples)
-
-This node is pre-configured with several models in `presets.py`, but you can use any vision-capable model supported by Ollama.
-
-- `qwen3-vl:8b` (Recommended)
-- `qwen3-vl:4b`
-- `llava:v1.6`
-- `moondream`
-- `minicpm-v`
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `ollama_url` | Text | `http://localhost:11434` | The API endpoint for your Ollama instance. |
+| `model` | Dropdown | `qwen3-vl:8b` | Select the locally pulled VLM model. |
+| `mode` | Dropdown | `natural_language` | Choose between descriptive paragraphs or keyword `tags`. |
+| `seed` | Integer | `0` | Lock the seed for deterministic outputs during prompt engineering. |
+| `keep_alive` | Integer | `5` | Minutes to keep the model loaded in VRAM. Use `-1` for indefinite. |
+| `thinking_mode` | Toggle | `False` | Enable to parse and extract the model's internal reasoning from `<think>` tags. |
+| `enable_thinking` | Toggle | `True` | If set to `False`, completely skips generating reasoning logic by appending instructions to the prompt, drastically speeding up generation. |
+| `custom_prompt` | Text | *(Empty)* | Override the built-in system prompt. Leave empty to use the standard mode prompts. |
 
 
-## License
+## 🤝 Contributing & License
 
-[MIT License](LICENSE)
+Contributions, issues, and feature requests are welcome! 
+Feel free to check the [issues page](https://github.com/jluo-github/comfyui-ollama-image-to-prompt/issues).
+
+Distributed under the **MIT License**. See `LICENSE` for more information.
 
 ---
 
