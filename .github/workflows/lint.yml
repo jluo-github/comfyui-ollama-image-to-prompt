@@ -23,4 +23,6 @@ jobs:
         pip install ruff
         
     - name: Run Ruff
-      run: ruff check .
+      run: |
+        ruff check .
+        ruff format --check .

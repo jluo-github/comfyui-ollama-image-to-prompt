@@ -19,30 +19,84 @@ def tensor_to_base64(image: torch.Tensor) -> str:
     return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 
+# Words that indicate conversational "slop" leaked by instruct-tuned VLMs.
+_SLOP_WORDS: frozenset[str] = frozenset(
+    {
+        "here",
+        "are",
+        "the",
+        "tags",
+        "image",
+        "shows",
+        "based",
+        "on",
+        "prompt",
+        "this",
+        "i",
+        "can",
+        "see",
+        "a",
+        "an",
+        "is",
+    }
+)
+
+
 def clean_tags(raw_text: str, trailing_separator: bool = True) -> str:
-    """Cleans up raw model output into a comma-separated tag string.
+    """Aggressively strips conversational slop and formats into pure Danbooru tags.
 
     Args:
-        raw_text: The raw text from the model (may contain newlines, bullets).
+        raw_text: The raw text from the model (may contain newlines, bullets, chat).
         trailing_separator: If True, appends ``", "`` to the end of non-empty output.
 
     Returns:
-        A cleaned, comma-separated tag string.
+        A cleaned, deduplicated, comma-separated tag string in lowercase.
     """
-    # Strip common conversational prefixes and markdown
-    cleaned = re.sub(
-        r"(?i)^(here are.*?:|\*\*?tags:?\*\*?|\*\*?prompt:?\*\*?|prompt:)",
-        "",
-        raw_text.strip(),
-    )
-    # Remove quotes and asterisks
-    cleaned = cleaned.replace('"', "").replace("*", "")
+    # 1. Strip all markdown and structural artifacts
+    cleaned = raw_text.replace('"', "").replace("*", "").replace("\n", ", ")
 
-    cleaned = cleaned.replace("\n", ", ").replace("- ", "")
+    # 1b. Strip colon-prefixed conversational preambles
+    # e.g. "Here are the tags for this image: 1girl, solo" → "1girl, solo"
+    colon_match = re.match(r"^[^,]*:\s*", cleaned)
+    if colon_match:
+        preamble = colon_match.group(0).lower()
+        if any(w in preamble for w in ("here", "tags", "image", "prompt", "based", "following")):
+            cleaned = cleaned[colon_match.end() :]
 
-    tags = [t.strip() for t in cleaned.split(",") if t.strip()]
+    # 2. Split into raw tokens
+    raw_tags = [t.strip() for t in cleaned.split(",") if t.strip()]
 
-    cleaned = ", ".join(tags)
-    if cleaned and trailing_separator:
-        cleaned += ", "
-    return cleaned
+    # 3. Filter out conversational slop and clean individual tags
+    final_tags: list[str] = []
+    seen: set[str] = set()
+
+    for tag in raw_tags:
+        words = tag.lower().split()
+
+        # Skip long conversational sentences that slipped past commas
+        if len(words) > 5 and any(w in _SLOP_WORDS for w in words[:3]):
+            continue
+
+        # Strip leading bullet dashes / asterisks (e.g. "- ", "* ")
+        # and numbered list markers (e.g. "1. ", "2. ") — but NOT bare digits
+        # that are part of tag names like "1girl", "1boy", "2girls"
+        tag = re.sub(r"^[-*]+\s*", "", tag)
+        tag = re.sub(r"^\d+\.\s*", "", tag)
+        tag = tag.strip()
+
+        # Strip trailing periods
+        tag = tag.rstrip(".")
+
+        # Lowercase for Danbooru convention
+        tag = tag.lower().strip()
+
+        # Deduplicate
+        if tag and tag not in seen:
+            final_tags.append(tag)
+            seen.add(tag)
+
+    cleaned_str = ", ".join(final_tags)
+    if cleaned_str and trailing_separator:
+        cleaned_str += ", "
+
+    return cleaned_str

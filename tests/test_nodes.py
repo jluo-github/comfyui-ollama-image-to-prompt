@@ -119,9 +119,7 @@ class TestThinkTagParsing:
     @patch("core.api.requests.post")
     def test_think_tags_extracted_when_enabled(self, mock_post: MagicMock) -> None:
         mock_response = MagicMock()
-        mock_response.json.return_value = {
-            "response": "<think>I need to analyze this.</think>A girl with blue hair."
-        }
+        mock_response.json.return_value = {"response": "<think>I need to analyze this.</think>A girl with blue hair."}
         mock_response.raise_for_status = MagicMock()
         mock_post.return_value = mock_response
 
@@ -143,9 +141,7 @@ class TestThinkTagParsing:
     @patch("core.api.requests.post")
     def test_think_tags_stripped_when_disabled(self, mock_post: MagicMock) -> None:
         mock_response = MagicMock()
-        mock_response.json.return_value = {
-            "response": "<think>Hidden thought.</think>Main output."
-        }
+        mock_response.json.return_value = {"response": "<think>Hidden thought.</think>Main output."}
         mock_response.raise_for_status = MagicMock()
         mock_post.return_value = mock_response
 
@@ -165,7 +161,12 @@ class TestThinkTagParsing:
         assert thoughts[0] == ""
 
     @patch("core.api.requests.post")
-    def test_disabled_thinking_modifies_prompt(self, mock_post: MagicMock) -> None:
+    def test_disabled_thinking_does_not_modify_prompt(self, mock_post: MagicMock) -> None:
+        """When enable_thinking=False, the prompt should NOT be altered.
+
+        The model is allowed to think internally for quality, but the
+        <think> blocks are silently stripped from the output.
+        """
         mock_response = MagicMock()
         mock_response.json.return_value = {"response": "Direct answer."}
         mock_response.raise_for_status = MagicMock()
@@ -183,10 +184,10 @@ class TestThinkTagParsing:
             enable_thinking=False,  # Set to False
         )
 
-        # Assert that "Do not output any reasoning" was added to the payload prompt
+        # Assert that prompt was NOT modified — no lobotomizing instruction added
         call_kwargs = mock_post.call_args.kwargs
         payload_prompt = call_kwargs["json"]["prompt"]
-        assert "Do not output any reasoning" in payload_prompt
+        assert "Do not output any reasoning" not in payload_prompt
 
 
 class TestBatchProcessing:

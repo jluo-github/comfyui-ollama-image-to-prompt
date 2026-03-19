@@ -71,3 +71,52 @@ class TestCleanTags:
         raw = "tag1,, , ,tag2"
         result = clean_tags(raw)
         assert result == "tag1, tag2, "
+
+    # --- New tests for hardened slop filter ---
+
+    def test_filters_conversational_slop(self) -> None:
+        """Long sentence-like fragments starting with slop words should be discarded."""
+        raw = "Here are the tags for this image: 1girl, solo, blue hair"
+        result = clean_tags(raw)
+        # The preamble "Here are the tags for this image:" is >5 words w/ slop -> dropped
+        assert "1girl" in result
+        assert "solo" in result
+        assert "here" not in result.lower().split(", ")
+
+    def test_deduplicates_tags(self) -> None:
+        """Repeated tags (case-insensitive) should appear only once."""
+        raw = "1girl, solo, 1Girl, SOLO, blue hair"
+        result = clean_tags(raw)
+        tags = [t.strip() for t in result.rstrip(", ").split(",")]
+        assert tags.count("1girl") == 1
+        assert tags.count("solo") == 1
+
+    def test_strips_trailing_periods(self) -> None:
+        raw = "1girl., solo., blue hair."
+        result = clean_tags(raw)
+        assert "." not in result
+
+    def test_strips_numbered_bullets(self) -> None:
+        """Numbered list items like '1. tag' should be cleaned to just the tag."""
+        raw = "1. 1girl\n2. solo\n3. blue hair"
+        result = clean_tags(raw)
+        assert "1girl" in result
+        assert "solo" in result
+        assert "blue hair" in result
+        # No leading numbers
+        for tag in result.rstrip(", ").split(", "):
+            assert not tag[0].isdigit() or tag == "1girl"
+
+    def test_preserves_valid_multi_word_tags(self) -> None:
+        """Short multi-word tags (Danbooru style) should be preserved."""
+        raw = "looking at viewer, holding sword, long hair"
+        result = clean_tags(raw)
+        assert "looking at viewer" in result
+        assert "holding sword" in result
+        assert "long hair" in result
+
+    def test_lowercases_output(self) -> None:
+        """All output should be lowercased per Danbooru convention."""
+        raw = "Blue Hair, RED EYES, Cowboy Shot"
+        result = clean_tags(raw)
+        assert result == "blue hair, red eyes, cowboy shot, "

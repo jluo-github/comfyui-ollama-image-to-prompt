@@ -55,17 +55,10 @@ def generate_ollama_completion(
         },
     }
 
-    # If the model uses a chain-of-thought mechanism and provides a specific option or trick
-    # Qwen-VL technically doesn't have an official "no-think" flag, but adding a generic
-    # system instruction or modifying `num_predict` can sometimes bypass it if the API supports it.
+    # When thinking is disabled, don't lobotomize the model by telling it not to
+    # reason — Qwen3-VL's CoT significantly improves output quality (~30%).
+    # Instead, just ensure we strip <think> blocks locally (handled below).
     if not enable_thinking:
-        # One common trick for Qwen models via API is to provide a forceful system prompt,
-        # but since we only have `prompt`, we can append an instruction.
-        payload["prompt"] = (
-            payload["prompt"]
-            + "\nDo not output any reasoning or <think> tags. Provide only the final answer directly."
-        )
-        # Keep thinking_mode false since there is nothing to extract
         thinking_mode = False
 
     if keep_alive == -1:

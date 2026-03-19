@@ -1,0 +1,15 @@
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+"presets.py" = ["E501"]  # Prompt strings are intentionally long
+
+[tool.ruff.lint.isort]
+known-first-party = ["core", "presets", "nodes"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
