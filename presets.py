@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 OLLAMA_MODELS = [
+    "qwen3.5:9b",
+    "qwen3.5:4b",
     "qwen3-vl:8b",
     "qwen3-vl:4b",
     # Kept for reference or if pulled later:
@@ -11,7 +13,7 @@ OLLAMA_MODELS = [
     "bakllava",
 ]
 
-DEFAULT_MODEL = "qwen3-vl:8b"
+DEFAULT_MODEL = "qwen3.5:9b"
 DEFAULT_URL = "http://localhost:11434"
 
 
