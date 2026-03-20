@@ -20,7 +20,6 @@ def generate_ollama_completion(
     seed: int,
     keep_alive: int,
     thinking_mode: bool,
-    enable_thinking: bool = True,
     custom_prompt: str = "",
 ) -> tuple[str, str]:
     """Sends a request to the Ollama API to generate a text completion from an image.
@@ -34,7 +33,6 @@ def generate_ollama_completion(
         seed: The random seed for generation to ensure reproducibility.
         keep_alive: The duration (in minutes) to keep the model loaded in memory, or -1 for indefinite.
         thinking_mode: Whether to parse and extract the model's `<think>` output block.
-        enable_thinking: If False, instructs the model not to generate the thinking block at all.
         custom_prompt: An optional custom prompt string. If provided and `mode` is "tags", tag cleaning is bypassed.
 
     Returns:
@@ -54,12 +52,6 @@ def generate_ollama_completion(
             "seed": seed,
         },
     }
-
-    # When thinking is disabled, don't lobotomize the model by telling it not to
-    # reason — Qwen3-VL's CoT significantly improves output quality (~30%).
-    # Instead, just ensure we strip <think> blocks locally (handled below).
-    if not enable_thinking:
-        thinking_mode = False
 
     if keep_alive == -1:
         payload["keep_alive"] = -1  # Indefinite
@@ -91,6 +83,9 @@ def generate_ollama_completion(
         # Post-processing for tags mode
         if mode == "tags" and not custom_prompt:
             generated_text = clean_tags(generated_text)
+
+        # Append BREAK token
+        generated_text = f"{generated_text.rstrip(', ')}, BREAK,"
 
         return generated_text, thought_process
 

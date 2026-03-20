@@ -38,6 +38,12 @@ _SLOP_WORDS: frozenset[str] = frozenset(
         "a",
         "an",
         "is",
+        "sure",
+        "certainly",
+        "yes",
+        "okay",
+        "absolutely",
+        "here's",
     }
 )
 
@@ -71,27 +77,29 @@ def clean_tags(raw_text: str, trailing_separator: bool = True) -> str:
     seen: set[str] = set()
 
     for tag in raw_tags:
-        words = tag.lower().split()
-
-        # Skip long conversational sentences that slipped past commas
-        if len(words) > 5 and any(w in _SLOP_WORDS for w in words[:3]):
-            continue
-
-        # Strip leading bullet dashes / asterisks (e.g. "- ", "* ")
-        # and numbered list markers (e.g. "1. ", "2. ") — but NOT bare digits
-        # that are part of tag names like "1girl", "1boy", "2girls"
+        # Strip leading bullet dashes / asterisks / numbered list markers
+        # (e.g. "1. ", "2. ") — but NOT bare digits that are part of tag names like "1girl"
         tag = re.sub(r"^[-*]+\s*", "", tag)
         tag = re.sub(r"^\d+\.\s*", "", tag)
-        tag = tag.strip()
 
-        # Strip trailing periods
-        tag = tag.rstrip(".")
+        # Lowercase and strip trailing punctuation/whitespace
+        tag = tag.lower().strip().rstrip(".!?-")
 
-        # Lowercase for Danbooru convention
-        tag = tag.lower().strip()
+        if not tag:
+            continue
+
+        words = tag.split()
+
+        # Catch enthusiastic 1-word affirmations
+        if len(words) == 1 and words[0] in {"sure", "certainly", "yes", "okay", "absolutely"}:
+            continue
+
+        # Skip conversational sentences that slipped past commas
+        if len(words) > 3 and any(w in _SLOP_WORDS for w in words[:3]):
+            continue
 
         # Deduplicate
-        if tag and tag not in seen:
+        if tag not in seen:
             final_tags.append(tag)
             seen.add(tag)
 

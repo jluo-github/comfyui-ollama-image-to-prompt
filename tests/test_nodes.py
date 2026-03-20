@@ -59,7 +59,6 @@ class TestPromptSelection:
             seed=42,
             keep_alive=5,
             thinking_mode=False,
-            enable_thinking=True,
         )
 
         assert len(texts) == 1
@@ -81,7 +80,6 @@ class TestPromptSelection:
             seed=42,
             keep_alive=5,
             thinking_mode=False,
-            enable_thinking=True,
         )
 
         assert "tag1" in texts[0]
@@ -104,7 +102,6 @@ class TestPromptSelection:
             seed=0,
             keep_alive=5,
             thinking_mode=False,
-            enable_thinking=True,
             custom_prompt="My custom instruction",
         )
 
@@ -132,7 +129,6 @@ class TestThinkTagParsing:
             seed=0,
             keep_alive=5,
             thinking_mode=True,
-            enable_thinking=True,
         )
 
         assert texts[0] == "A girl with blue hair."
@@ -154,40 +150,10 @@ class TestThinkTagParsing:
             seed=0,
             keep_alive=5,
             thinking_mode=False,
-            enable_thinking=True,
         )
 
         assert texts[0] == "Main output."
         assert thoughts[0] == ""
-
-    @patch("core.api.requests.post")
-    def test_disabled_thinking_does_not_modify_prompt(self, mock_post: MagicMock) -> None:
-        """When enable_thinking=False, the prompt should NOT be altered.
-
-        The model is allowed to think internally for quality, but the
-        <think> blocks are silently stripped from the output.
-        """
-        mock_response = MagicMock()
-        mock_response.json.return_value = {"response": "Direct answer."}
-        mock_response.raise_for_status = MagicMock()
-        mock_post.return_value = mock_response
-
-        node = OllamaImageToPrompt()
-        node.generate_prompt(
-            image=self._make_batch(),
-            ollama_url="http://localhost:11434",
-            model="qwen3-vl:8b",
-            mode="natural_language",
-            seed=0,
-            keep_alive=5,
-            thinking_mode=False,
-            enable_thinking=False,  # Set to False
-        )
-
-        # Assert that prompt was NOT modified — no lobotomizing instruction added
-        call_kwargs = mock_post.call_args.kwargs
-        payload_prompt = call_kwargs["json"]["prompt"]
-        assert "Do not output any reasoning" not in payload_prompt
 
 
 class TestBatchProcessing:
@@ -208,7 +174,6 @@ class TestBatchProcessing:
             seed=0,
             keep_alive=5,
             thinking_mode=False,
-            enable_thinking=True,
         )
 
         assert len(texts) == 3

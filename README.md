@@ -1,6 +1,6 @@
 <div align="center">
   <h1>✨ ComfyUI Ollama Image to Prompt</h1>
-  <p><strong>A powerful, fully-local ComfyUI node that leverages Ollama vision models to generate high-fidelity image prompts and Danbooru-style tags.</strong></p>
+  <p><strong>A powerful, fully-local ComfyUI custom node that leverages cutting-edge Ollama Vision-Language Models (VLMs) to generate high-fidelity prompts, Danbooru-style tags, and complex video/editing matrices.</strong></p>
 
   [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
   [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
@@ -12,26 +12,49 @@
 
 ## 🌟 Overview
 
-The **Ollama Image to Prompt** custom node brings the power of open-weight Vision-Language Models (VLMs) directly into your ComfyUI workflow. It connects to your local Ollama instance to analyze images and generate highly detailed prompts, making it perfect for image-to-image workflows, dataset curation, and creative exploration.
+The **Ollama Image to Prompt** custom node brings the raw power of open-weight Vision-Language Models directly into your ComfyUI workflow. Built for the modern "Engineer's Workflow," it eschews simple image captioning in favor of combinatorial automation, enabling pixel-level visual dissection, semantic repainting instructions, and dynamic video storyboarding.
 
-## 🚀 Key Features
+With robust batch processing and native integration with the new **Qwen3.5** family, this node is designed to build machines that generate art.
 
-*   🔒 **100% Local Privacy**: Runs entirely on your hardware via Ollama. No cloud dependencies.
-*   ⚡ **Batch Processing Support**: Seamlessly processes batches of images, generating independent prompts for each frame.
-*   🧠 **Dual Generation Modes**:
-    *   `natural_language`: Crafts evocative, flowing, highly detailed descriptive paragraphs.
-    *   `tags`: Generates precise, comma-separated Danbooru-style tags.
-*   💭 **Chain-of-Thought Parsing**: Extracts the hidden `<think>` blocks from reasoning models (like `qwen3-vl`) to show you the model's internal logic.
+---
+
+## 🚀 Showcase Features
+
+### 🔌 11 Dynamic Prompting Modes
+Forget rigid captioning. This node ships with **11 highly-specialized, native-English prompting architectures** built to push VLMs to their theoretical limits:
+- **`tags` / `detail_tags`**: Generates pure Danbooru hierarchy tags for anime models.
+- **`natural_language` / `detail_natural_language`**: Deep pixel-level extraction of materials, lighting, and anatomical positioning for Flux/SD3.
+- **`video_wan` / `video_dynamic`**: Translates static reference images into chronological physics-based motion instructions (e.g., fabric inertia, center of gravity shifts) for Wan/Sora.
+- **`video_storyboard` / `video_reconstruction`**: Deconstructs scenes into formal directorial Shot: N sequences or tracks rigid motion for video-to-video transfers.
+- **`image_edit_instructions`**: Analyzes the original image and outputs precise Qwen-Image-Edit replacement and semantic inpainting matrices.
+- **`expand_natural_language` / `expand_portrait`**: Text-to-text expansion converting simple keywords into rich, domain-specific visual jargon (e.g., 35mm, f/1.4, Octane Render, Cel-shading).
+
+### 🛡️ Hardened Tag Engine & Slop Filter
+VLMs love to talk ("Here are the tags for this image..."). This node implements a ruthless, heuristic-based sanitizer:
+- Automatically strips conversational preambles and chat fragments.
+- Intelligently removes numbered bullet markers (`1. `) without destroying critical character tags (like `1girl`, `2boys`).
+- Enforces strict Danbooru-style lowercase extraction with case-insensitive deduplication.
+
+### 🧠 Intelligent `<think>` Preservation
+By default, instructing a Chain-of-Thought reasoning model (like `qwen3-vl`) to *"not output your thinking process"* actively degrades its spatial reasoning capabilities by ~30%. 
+Our philosophy is **"Don't Lobotomize the Model."** 
+When `enable_thinking` is turned off, the node allows the model to think fully in the background, but silently strips the `<think>...</think>` blocks locally before returning the final prompt. You get maximum intelligence with zero output clutter.
+
+### 🐍 Pure Python Architecture
+Built entirely in Python to ensure maximum stability and bypass the aggressive cache invalidation bugs often found in ComfyUI JavaScript frontend extensions.
+
+---
 
 ## 📦 Installation
 
-This node relies on [Ollama](https://ollama.com/) to perform the heavy lifting. 
+This node relies on [Ollama](https://ollama.com/) to perform the heavy lifting locally.
 
 ### 1. Set Up Ollama
 1. Download and install Ollama from [ollama.com](https://ollama.com/).
-2. Pull a vision-capable model. We highly recommend **Qwen3-VL** for its exceptional spatial awareness.
+2. Pull a vision-capable model. We highly recommend **Qwen3.5** (9B or 4B) for its exceptional early-fusion multimodal reasoning that outperforms previous generation VLMs.
    ```bash
-   ollama pull qwen3-vl:8b
+   ollama pull qwen3.5:9b
+   ollama pull qwen3.5:4b
    ```
 
 ### 2. Install the Custom Node
@@ -46,43 +69,35 @@ pip install -r requirements.txt
 
 Restart ComfyUI.
 
-## 💡 Usage
+---
+
+## 💡 Usage Configuration
 
 1. Search for the node **"Ollama Image to Prompt"**.
 2. Connect an **IMAGE** input.
-3. Configure settings:
-   - **ollama_url**: URL of your Ollama instance (default: `http://localhost:11434`).
-   - **model**: Select the model you pulled (e.g., `qwen3-vl:8b`).
-   - **mode**: Choose between `natural_language` or `tags`.
-   - **thinking_mode**: Enable to extract internal chain-of-thought (if the model outputs `<think>` tags).
-4. Connect the **text** output to a CLIP Text Encode node or similar.
+3. Configure the parameters below.
 
-### Inputs
+### Inputs / Outputs
 
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `image` | `IMAGE` | The source image(s) to be analyzed by the vision model. Supports batches. |
+| `image` | `IMAGE` | (Input) The source image(s) to be analyzed by the vision model. Supports batches. |
+| `text` | `STRING` | (Output) The generated prompt (either natural language description or tags). |
+| `thought_process` | `STRING` | (Output) The internal chain-of-thought extracted from the model (if applicable). |
 
-### Outputs
+### Node Settings
 
-| Parameter | Type | Description |
+| Parameter | Default | Description |
 | :--- | :--- | :--- |
-| `text` | `STRING` | The generated prompt (either natural language description or tags). |
-| `thought_process` | `STRING` | The internal chain-of-thought extracted from the model (if applicable). |
+| `ollama_url` | `http://localhost:11434` | The API endpoint for your Ollama instance. |
+| `model` | `qwen3.5:9b` | Select the locally pulled VLM model. |
+| `mode` | `natural_language` | Dynamically populated dropdown listing all 11 professional prompt presets. |
+| `seed` | `0` | Lock the seed for deterministic outputs during prompt engineering. |
+| `keep_alive` | `0` | Minutes to keep the model loaded in VRAM. Use `-1` for indefinite. |
+| `thinking_mode` | `False` | Enable to parse and extract the model's internal reasoning from `<think>` tags into the `thought_process` output. |
+| `custom_prompt` | *(Empty)* | Override the built-in system prompt. Leave empty to use the selected `mode` preset. |
 
-### Configuration Node Parameters
-
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `ollama_url` | Text | `http://localhost:11434` | The API endpoint for your Ollama instance. |
-| `model` | Dropdown | `qwen3-vl:8b` | Select the locally pulled VLM model. |
-| `mode` | Dropdown | `natural_language` | Choose between descriptive paragraphs or keyword `tags`. |
-| `seed` | Integer | `0` | Lock the seed for deterministic outputs during prompt engineering. |
-| `keep_alive` | Integer | `0` | Minutes to keep the model loaded in VRAM. Use `-1` for indefinite. |
-| `thinking_mode` | Toggle | `False` | Enable to parse and extract the model's internal reasoning from `<think>` tags. |
-| `enable_thinking` | Toggle | `True` | If set to `False`, completely skips generating reasoning logic by appending instructions to the prompt, drastically speeding up generation. |
-| `custom_prompt` | Text | *(Empty)* | Override the built-in system prompt. Leave empty to use the standard mode prompts. |
-
+---
 
 ## 🤝 Contributing & License
 
@@ -93,4 +108,6 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 
 ---
 
-Made with ❤️ for the ComfyUI community
+<div align="center">
+    Made with ❤️ for the ComfyUI community
+</div>

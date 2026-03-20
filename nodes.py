@@ -9,18 +9,16 @@ try:
     from .presets import (
         DEFAULT_MODEL,
         DEFAULT_URL,
-        NATURAL_LANGUAGE_PROMPT,
         OLLAMA_MODELS,
-        TAGS_PROMPT,
+        PROMPT_PRESETS,
     )
 except ImportError:
     from core.api import generate_ollama_completion
     from presets import (
         DEFAULT_MODEL,
         DEFAULT_URL,
-        NATURAL_LANGUAGE_PROMPT,
         OLLAMA_MODELS,
-        TAGS_PROMPT,
+        PROMPT_PRESETS,
     )
 
 
@@ -40,11 +38,10 @@ class OllamaImageToPrompt:
                     {"multiline": False, "default": DEFAULT_URL},
                 ),
                 "model": (OLLAMA_MODELS, {"default": DEFAULT_MODEL}),
-                "mode": (["natural_language", "tags"], {"default": "natural_language"}),
+                "mode": (list(PROMPT_PRESETS.keys()), {"default": "natural_language"}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xFFFFFFFFFFFFFFFF}),
                 "keep_alive": ("INT", {"default": 0, "min": -1, "max": 60, "step": 1}),
                 "thinking_mode": ("BOOLEAN", {"default": False}),
-                "enable_thinking": ("BOOLEAN", {"default": True}),
             },
             "optional": {
                 "custom_prompt": (
@@ -73,7 +70,6 @@ class OllamaImageToPrompt:
         seed: int,
         keep_alive: int,
         thinking_mode: bool,
-        enable_thinking: bool,
         custom_prompt: str = "",
     ) -> tuple[list[str], list[str]]:
         """Generates prompts from input images via the Ollama API.
@@ -93,10 +89,8 @@ class OllamaImageToPrompt:
         final_prompt = ""
         if custom_prompt and custom_prompt.strip():
             final_prompt = custom_prompt
-        elif mode == "tags":
-            final_prompt = TAGS_PROMPT
-        else:  # natural_language
-            final_prompt = NATURAL_LANGUAGE_PROMPT
+        else:
+            final_prompt = PROMPT_PRESETS.get(mode, PROMPT_PRESETS.get("natural_language", ""))
 
         # Support batch processing
         # ComfyUI passes images as (B, H, W, C)
@@ -110,7 +104,6 @@ class OllamaImageToPrompt:
                 seed=seed,
                 keep_alive=keep_alive,
                 thinking_mode=thinking_mode,
-                enable_thinking=enable_thinking,
                 custom_prompt=custom_prompt,
             )
 
@@ -118,3 +111,8 @@ class OllamaImageToPrompt:
             thought_processes.append(thought_process)
 
         return (generated_texts, thought_processes)
+
+    @classmethod
+    def IS_CHANGED(cls, seed: int, **kwargs: Any) -> float | int | str:
+        """Forces ComfyUI to re-evaluate the node if the seed changes."""
+        return seed
