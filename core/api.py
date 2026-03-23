@@ -42,6 +42,9 @@ def generate_ollama_completion(
     """
     img_b64 = tensor_to_base64(img_tensor)
 
+    if not thinking_mode:
+        final_prompt += "\n\nCRITICAL: Do NOT output any thinking process. Do NOT use <think> tags. Provide the final output immediately."
+
     # Prepare payload
     payload = {
         "model": model,

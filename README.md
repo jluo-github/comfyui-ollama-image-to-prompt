@@ -1,6 +1,6 @@
 <div align="center">
   <h1>✨ ComfyUI Ollama Image to Prompt</h1>
-  <p><strong>A powerful, fully-local ComfyUI custom node that leverages cutting-edge Ollama Vision-Language Models (VLMs) to generate high-fidelity prompts, Danbooru-style tags, and complex video/editing matrices.</strong></p>
+  <p><strong>A custom ComfyUI node built to hook up local Ollama vision models for generating actually good prompts, Danbooru tags, and video motion instructions.</strong></p>
 
   [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
   [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
@@ -12,9 +12,9 @@
 
 ## 🌟 Overview
 
-The **Ollama Image to Prompt** custom node brings the raw power of open-weight Vision-Language Models directly into your ComfyUI workflow. Built for the modern "Engineer's Workflow," it eschews simple image captioning in favor of combinatorial automation, enabling pixel-level visual dissection, semantic repainting instructions, and dynamic video storyboarding.
+The **Ollama Image to Prompt** custom node is designed to run local Vision-Language Models (VLMs) like Qwen directly inside ComfyUI workflows. It generates highly detailed natural language prompts, extracts strict Danbooru-style tags, performs text-to-text keyword expansion, and creates motion storyboards for AI video generation.
 
-With robust batch processing and native integration with the new **Qwen3.5** family, this node is designed to build machines that generate art.
+It handles batch processing efficiently, allowing you to process large folders of images or video frames all at once.
 
 ---
 
@@ -27,7 +27,7 @@ Forget rigid captioning. This node ships with **11 highly-specialized, native-En
 - **`video_wan` / `video_dynamic`**: Translates static reference images into chronological physics-based motion instructions (e.g., fabric inertia, center of gravity shifts) for Wan/Sora.
 - **`video_storyboard` / `video_reconstruction`**: Deconstructs scenes into formal directorial Shot: N sequences or tracks rigid motion for video-to-video transfers.
 - **`image_edit_instructions`**: Analyzes the original image and outputs precise Qwen-Image-Edit replacement and semantic inpainting matrices.
-- **`expand_natural_language` / `expand_portrait`**: Text-to-text expansion converting simple keywords into rich, domain-specific visual jargon (e.g., 35mm, f/1.4, Octane Render, Cel-shading).
+- **`expand_natural_language` / `expand_portrait`**: Text-to-text expansion converting simple keywords into rich, domain-specific visual jargon. *(Just pass your simple keywords into the new `keywords` input field)*.
 
 ### 🛡️ Hardened Tag Engine & Slop Filter
 VLMs love to talk ("Here are the tags for this image..."). This node implements a ruthless, heuristic-based sanitizer:
@@ -35,15 +35,12 @@ VLMs love to talk ("Here are the tags for this image..."). This node implements 
 - Intelligently removes numbered bullet markers (`1. `) without destroying critical character tags (like `1girl`, `2boys`).
 - Enforces strict Danbooru-style lowercase extraction with case-insensitive deduplication.
 
-### 🧠 Intelligent `<think>` Preservation
-By default, instructing a Chain-of-Thought reasoning model (like `qwen3-vl`) to *"not output your thinking process"* actively degrades its spatial reasoning capabilities by ~30%. 
-Our philosophy is **"Don't Lobotomize the Model."** 
-When `enable_thinking` is turned off, the node allows the model to think fully in the background, but silently strips the `<think>...</think>` blocks locally before returning the final prompt. You get maximum intelligence with zero output clutter.
+### 🧠 Intelligent `<think>` Engine & Speed Toggle
+Models like **Qwen3-VL** natively generate invisible `<think>` blocks to reason about spatial layout before generating standard tags.
+If you need maximum reasoning capabilities (like accurate finger counting or specific physical interactions), leave `thinking_mode` **True**. The node captures the internal thought process and outputs it to the `thought_process` pin.
+If you prioritize **Speed** and want the model to generate tags instantly without wasting time, toggle `thinking_mode` to **False**. The node will systematically inject a strict anti-thinking instruction to bypass the model's reasoning phase entirely and return results substantially faster.
 
-### 🐍 Pure Python Architecture
-Built entirely in Python to ensure maximum stability and bypass the aggressive cache invalidation bugs often found in ComfyUI JavaScript frontend extensions.
 
----
 
 ## 📦 Installation
 
@@ -96,6 +93,7 @@ Restart ComfyUI.
 | `keep_alive` | `0` | Minutes to keep the model loaded in VRAM. Use `-1` for indefinite. |
 | `thinking_mode` | `False` | Enable to parse and extract the model's internal reasoning from `<think>` tags into the `thought_process` output. |
 | `custom_prompt` | *(Empty)* | Override the built-in system prompt. Leave empty to use the selected `mode` preset. |
+| `keywords` | *(Empty)* | Add targeted keywords or extra instructions without overriding the selected mode's built-in system instructions. |
 
 ---
 

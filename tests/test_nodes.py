@@ -25,6 +25,10 @@ class TestInputTypes:
         optional = OllamaImageToPrompt.INPUT_TYPES()["optional"]
         assert "custom_prompt" in optional
 
+    def test_optional_has_keywords(self) -> None:
+        optional = OllamaImageToPrompt.INPUT_TYPES()["optional"]
+        assert "keywords" in optional
+
 
 class TestNodeAttributes:
     def test_return_types(self) -> None:
@@ -62,7 +66,9 @@ class TestPromptSelection:
         )
 
         assert len(texts) == 1
-        assert texts[0] == "A beautiful scene."
+        assert texts[0] == "A beautiful scene., BREAK,"
+        call_args = mock_post.call_args[1]["json"]
+        assert "CRITICAL: Do NOT output any thinking process." in call_args["prompt"]
 
     @patch("core.api.requests.post")
     def test_tags_mode_cleans_output(self, mock_post: MagicMock) -> None:
@@ -84,7 +90,7 @@ class TestPromptSelection:
 
         assert "tag1" in texts[0]
         assert "\n" not in texts[0]
-        assert texts[0].endswith(", ")
+        assert texts[0].endswith(", BREAK,")
 
     @patch("core.api.requests.post")
     def test_custom_prompt_overrides_mode(self, mock_post: MagicMock) -> None:
@@ -106,7 +112,33 @@ class TestPromptSelection:
         )
 
         # With custom_prompt, tags cleanup should NOT run
-        assert texts[0] == "custom output"
+        assert texts[0] == "custom output, BREAK,"
+
+    @patch("core.api.requests.post")
+    def test_keywords_appended_to_prompt(self, mock_post: MagicMock) -> None:
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"response": "expanded output"}
+        mock_response.raise_for_status = MagicMock()
+        mock_post.return_value = mock_response
+
+        node = OllamaImageToPrompt()
+        texts, _ = node.generate_prompt(
+            image=self._make_batch(),
+            ollama_url="http://localhost:11434",
+            model="qwen3-vl:8b",
+            mode="natural_language",
+            seed=0,
+            keep_alive=5,
+            thinking_mode=False,
+            keywords="1girl, neon",
+        )
+
+        assert texts[0] == "expanded output, BREAK,"
+        # Verify the prompt sent to the API contains both instruction AND keywords
+        call_args = mock_post.call_args[1]["json"]
+        assert "User Keywords / Instructions:" in call_args["prompt"]
+        assert "1girl, neon" in call_args["prompt"]
+        assert "Analyze this image and write a highly detailed" in call_args["prompt"]
 
 
 class TestThinkTagParsing:
@@ -131,8 +163,10 @@ class TestThinkTagParsing:
             thinking_mode=True,
         )
 
-        assert texts[0] == "A girl with blue hair."
+        assert texts[0] == "A girl with blue hair., BREAK,"
         assert thoughts[0] == "I need to analyze this."
+        call_args = mock_post.call_args[1]["json"]
+        assert "CRITICAL: Do NOT output any thinking process." not in call_args["prompt"]
 
     @patch("core.api.requests.post")
     def test_think_tags_stripped_when_disabled(self, mock_post: MagicMock) -> None:
@@ -152,7 +186,7 @@ class TestThinkTagParsing:
             thinking_mode=False,
         )
 
-        assert texts[0] == "Main output."
+        assert texts[0] == "Main output., BREAK,"
         assert thoughts[0] == ""
 
 

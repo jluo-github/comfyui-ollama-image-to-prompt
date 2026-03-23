@@ -52,6 +52,14 @@ class OllamaImageToPrompt:
                         "placeholder": "Optional: Override default system prompt. Leave empty to use 'mode'.",
                     },
                 ),
+                "keywords": (
+                    "STRING",
+                    {
+                        "multiline": True,
+                        "default": "",
+                        "placeholder": "Optional: Keywords for 'expand' modes or additional rules.",
+                    },
+                ),
             },
         }
 
@@ -71,6 +79,7 @@ class OllamaImageToPrompt:
         keep_alive: int,
         thinking_mode: bool,
         custom_prompt: str = "",
+        keywords: str = "",
     ) -> tuple[list[str], list[str]]:
         """Generates prompts from input images via the Ollama API.
 
@@ -91,6 +100,9 @@ class OllamaImageToPrompt:
             final_prompt = custom_prompt
         else:
             final_prompt = PROMPT_PRESETS.get(mode, PROMPT_PRESETS.get("natural_language", ""))
+
+        if keywords and keywords.strip():
+            final_prompt += f"\n\nUser Keywords / Instructions:\n{keywords.strip()}"
 
         # Support batch processing
         # ComfyUI passes images as (B, H, W, C)
