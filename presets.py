@@ -13,7 +13,7 @@ DEFAULT_URL = "http://localhost:11434"
 # ---------------------------------------------------------------------------
 # 1. CORE NATURAL LANGUAGE
 # ---------------------------------------------------------------------------
-NATURAL_LANGUAGE_PROMPT = """Analyze this image and write a highly detailed, evocative natural language prompt designed to perfectly recreate it using an AI image generator (like Flux, Midjourney, or SD3). Write in flowing, descriptive prose without conversational filler. Focus intensely on the following elements:
+NATURAL_LANGUAGE_PROMPT = """Analyze this image and write a highly detailed, evocative natural language prompt designed to perfectly recreate it using a modern SOTA AI image generator (like Flux or contemporary Transformers). Write in flowing, descriptive prose without conversational filler. Focus intensely on the following elements:
 1. **Subject & Pose**: Describe the subject(s) with extreme precision. Detail their exact physical appearance, hair styling, eye color, and clothing (including fabric types like silk, worn denim, or glossy latex). Crucially, describe their exact **Pose** (e.g., leaning against a wall, contrapposto, reaching out) and **Expression** (e.g., a melancholic gaze, a vibrant smirk, heavy eyelids). Capture the emotional weight.
 2. **Camera & Framing**: Define the shot type (e.g., extreme close-up, medium cowboy shot, wide establishing shot, dutch angle, shot from below). Describe the depth of field (shallow focus, bokeh) and perspective.
 3. **Environment & Context**: What surrounds the subject? Detail the background elements, props, architecture, or nature. Ground the subject in a specific setting.
