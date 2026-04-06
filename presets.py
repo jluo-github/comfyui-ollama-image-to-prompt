@@ -305,11 +305,16 @@ CRITICAL RULES:
 3. Do NOT output any conversational text or explanations. Output ONLY the generated prompt text.
 
 ### OUTPUT FORMAT
-You must output exactly ONE block of text that merges comma-separated tags with a detailed natural language description, in this precise order:
-
+For standard anime images, output exactly ONE block of text that merges comma-separated tags with a detailed natural language description, in this precise order:
 [Quality Tags], [Time Period], [Meta Tags], [Safety], [Artist/Style], [Core Subjects], [2-3 Sentences of Natural Language Description]
 
+If the image is specifically a non-anime artwork, pop-culture dataset image, or abstract piece, insert a dataset tag and an optional title/alt-text AT THE VERY BEGINNING, separated by newlines, before the main prompt block:
+[Dataset Tag]
+[Image Alt-Text or Title]
+[Quality Tags], [Time Period], [Meta Tags], [Safety], [Artist/Style], [Core Subjects], [Natural Language Description]
+
 ### TAG CATEGORIES (Use these at the start of your prompt):
+- Dataset tags (optional, for non-anime ONLY, placed on its own line at the very start): ye-pop, deviantart
 - Quality tags: masterpiece, best quality, good quality, normal quality, score_9, score_8
 - Time period tags: year 2025, newest, recent
 - Meta tags: highres, absurdres, anime screenshot, official art
@@ -324,8 +329,13 @@ Immediately after the tags, write 2 or 3 sentences describing the scene.
 - Describe their expression and any actions they are performing.
 - Describe the setting, background, and environment.
 
-### EXAMPLE UNIFIED OUTPUT:
-masterpiece, best quality, score_9, year 2025, newest, highres, safe, @nnn yryr, 1girl, oomuro sakurako, yuru yuri, An anime girl with short brown hair and brown eyes is smiling brightly with one eye closed. She is wearing a festive red santa costume consisting of a red shirt, brown skirt, a red capelet, and a fluffy santa hat. She is holding a gift bag while standing against a simple white background with soft lighting."""
+### EXAMPLE UNIFIED OUTPUT (Standard Anime):
+masterpiece, best quality, score_9, year 2025, newest, highres, safe, @nnn yryr, 1girl, oomuro sakurako, yuru yuri, An anime girl with short brown hair and brown eyes is smiling brightly with one eye closed. She is wearing a festive red santa costume consisting of a red shirt, brown skirt, a red capelet, and a fluffy santa hat. She is holding a gift bag while standing against a simple white background with soft lighting.
+
+### EXAMPLE UNIFIED OUTPUT (Non-Anime / ye-pop / deviantart):
+deviantart
+Flame
+masterpiece, best quality, score_9, year 2025, newest, highres, safe, Digital painting of a fiery dragon with glowing yellow eyes, black horns, and a long, sinuous tail, perched on a glowing, molten rock formation. The background is a gradient of dark purple to orange."""
 
 # ---------------------------------------------------------------------------
 # REGISTRY
