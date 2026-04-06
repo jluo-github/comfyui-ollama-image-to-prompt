@@ -38,6 +38,7 @@ Connect an **IMAGE** to the node and select a **mode**.
 | `video_storyboard` / `video_reconstruction` | Shot-by-shot directorial sequences and rigid motion tracking. |
 | `image_edit_instructions` | Precise modification instructions for Qwen-Image-Edit. |
 | `expand_natural_language` / `expand_portrait` | Text-to-text keyword expansion engine. |
+| `anima` | Unified merged output (tags + natural language) strictly tailored for the Anima diffusion model. |
 
 ### Settings
 | Parameter | Default | Description |
