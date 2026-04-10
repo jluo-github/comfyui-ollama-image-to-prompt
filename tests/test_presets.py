@@ -5,7 +5,7 @@ from presets import (
     DEFAULT_URL,
     NATURAL_LANGUAGE_PROMPT,
     OLLAMA_MODELS,
-    TAGS_PROMPT,
+    DANBOORU_TAGS_PROMPT,
 )
 
 
@@ -19,17 +19,17 @@ class TestPresets:
     def test_default_url_is_valid(self) -> None:
         assert DEFAULT_URL.startswith("http")
 
-    def test_tags_prompt_is_non_empty(self) -> None:
-        assert isinstance(TAGS_PROMPT, str)
-        assert len(TAGS_PROMPT) > 50
+    def test_danbooru_tags_prompt_is_non_empty(self) -> None:
+        assert isinstance(DANBOORU_TAGS_PROMPT, str)
+        assert len(DANBOORU_TAGS_PROMPT) > 50
 
     def test_natural_language_prompt_is_non_empty(self) -> None:
         assert isinstance(NATURAL_LANGUAGE_PROMPT, str)
         assert len(NATURAL_LANGUAGE_PROMPT) > 50
 
-    def test_tags_prompt_is_valid(self) -> None:
+    def test_danbooru_tags_prompt_is_valid(self) -> None:
         # Just test it's a valid string since wording might change
-        assert isinstance(TAGS_PROMPT, str)
+        assert isinstance(DANBOORU_TAGS_PROMPT, str)
 
     def test_natural_language_prompt_mentions_expression(self) -> None:
         assert "expression" in NATURAL_LANGUAGE_PROMPT.lower()

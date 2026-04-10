@@ -74,7 +74,7 @@ def generate_ollama_completion(
 
         result = response.json()
         generated_text = result.get("response", "")
-        
+
         # Native Ollama handling: it separates thoughts into a dedicated field
         thought_process = result.get("thinking", "").strip()
 
@@ -88,7 +88,7 @@ def generate_ollama_completion(
 
             if not thought_process:  # Use fallback if native field was missing
                 thought_process = captured_thought
-                
+
         if not thinking_mode:
             thought_process = ""
 
