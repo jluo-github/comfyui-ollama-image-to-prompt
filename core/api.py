@@ -99,7 +99,7 @@ def generate_ollama_completion(
         # Append BREAK token for non-JSON modes, or clean markdown JSON blocks
         if mode == "json_extract":
             # Attempt to strip markdown code block boundaries if the model wraps the JSON
-            json_match = re.search(r'```(?:json)?\s*(.*?)\s*```', generated_text, re.DOTALL)
+            json_match = re.search(r"```(?:json)?\s*(.*?)\s*```", generated_text, re.DOTALL)
             if json_match:
                 generated_text = json_match.group(1).strip()
             else:
