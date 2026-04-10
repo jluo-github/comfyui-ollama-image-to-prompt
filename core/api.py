@@ -26,7 +26,7 @@ def generate_ollama_completion(
 
     Args:
         ollama_url: The base URL of the Ollama instance (e.g., "http://localhost:11434").
-        model: The name of the vision model to use (e.g., "qwen2.5-vl").
+        model: The name of the vision model to use (e.g., "qwen3.5-vl").
         final_prompt: The complete prompt to send to the model.
         img_tensor: A PyTorch tensor representing the image.
         mode: The generation mode ("natural_language" or "tags").
@@ -54,6 +54,7 @@ def generate_ollama_completion(
         "prompt": final_prompt,
         "images": [img_b64],
         "stream": False,
+        "think": thinking_mode,
         "options": {
             "seed": seed,
         },
@@ -73,25 +74,38 @@ def generate_ollama_completion(
 
         result = response.json()
         generated_text = result.get("response", "")
-        thought_process = ""
+        
+        # Native Ollama handling: it separates thoughts into a dedicated field
+        thought_process = result.get("thinking", "").strip()
 
-        # Robust Parsing for <think> ... </think>
-        think_pattern = re.compile(r"<think>(.*?)</think>", re.DOTALL)
+        # Fallback: Robust Parsing for <think> ... </think> in case of proxies or older models
+        think_pattern = re.compile(r"<think>(.*?)(?:</think>|$)", re.DOTALL)
         think_match = think_pattern.search(generated_text)
 
         if think_match:
             captured_thought = think_match.group(1).strip()
             generated_text = think_pattern.sub("", generated_text).strip()
 
-            if thinking_mode:
+            if not thought_process:  # Use fallback if native field was missing
                 thought_process = captured_thought
+                
+        if not thinking_mode:
+            thought_process = ""
 
         # Post-processing for tags mode
-        if mode == "tags" and not custom_prompt:
+        if mode in ["danbooru_tags", "expand_tags"] and not custom_prompt:
             generated_text = clean_tags(generated_text)
 
-        # Append BREAK token
-        generated_text = f"{generated_text.rstrip(', ')}, BREAK,"
+        # Append BREAK token for non-JSON modes, or clean markdown JSON blocks
+        if mode == "json_extract":
+            # Attempt to strip markdown code block boundaries if the model wraps the JSON
+            json_match = re.search(r'```(?:json)?\s*(.*?)\s*```', generated_text, re.DOTALL)
+            if json_match:
+                generated_text = json_match.group(1).strip()
+            else:
+                generated_text = generated_text.strip()
+        else:
+            generated_text = f"{generated_text.rstrip(', ')}, BREAK,"
 
         return generated_text, thought_process
 

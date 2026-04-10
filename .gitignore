@@ -36,6 +36,7 @@ ENV/
 *.swp
 *.swo
 *~
+.vscode/
 
 # OS files
 .DS_Store

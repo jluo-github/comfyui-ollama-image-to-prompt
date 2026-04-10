@@ -11,7 +11,7 @@
 ---
 
 ## 🌟 Overview
-The **Ollama Image to Prompt** custom node is designed to run local Vision-Language Models (VLMs) like Qwen directly inside ComfyUI workflows. It automates vision-to-prompt pipelines, extracting detailed natural language, Danbooru tags, and video motion instructions using 11 specialized prompting architectures.
+The **Ollama Image to Prompt** custom node is designed to run local Vision-Language Models (VLMs) like Qwen directly inside ComfyUI workflows. It automates vision-to-prompt pipelines, extracting detailed natural language, Danbooru tags, and video motion instructions using 9 specialized prompting architectures.
 
 ![Ollama Image to Prompt Node](ollama-image-to-prompt-node.jpg)
 
@@ -32,13 +32,15 @@ Connect an **IMAGE** to the node and select a **mode**.
 ### Prompt Architectures
 | Mode | Description |
 | :--- | :--- |
-| `tags` / `detail_tags` | Structured Danbooru hierarchy for anime models (e.g., Illustrious). |
-| `natural_language` / `detail_natural_language` | Pixel-level extraction optimized for Flux, Qwen, Z-Image, and modern Transformers. |
-| `video_wan` / `video_dynamic` | Direct motion physics for SOTA video models (e.g., Wan2.2). |
-| `video_storyboard` / `video_reconstruction` | Shot-by-shot directorial sequences and rigid motion tracking. |
-| `image_edit_instructions` | Precise modification instructions for Qwen-Image-Edit. |
-| `expand_natural_language` / `expand_portrait` | Text-to-text keyword expansion engine. |
+| `natural_language` | Dense, highly-descriptive, pixel-level prose extraction. Optimized for Flux, Qwen, Z-Image, etc. |
+| `danbooru_tags` | Pure subset of booru-style tags separated by commas. Optimized for NoobAI, Illustrious, etc. |
+| `expand_prompt` | Takes short user keywords and intelligently up-samples them into rich full-sentence prompts (handles portraits/scenes). |
+| `expand_tags` | Takes short user keywords and optimally expands them into dense, pixel-perfect Danbooru tags. |
+| `image_edit` | Structured instruction prompts for image-to-image edit models (e.g., Qwen-Image-Edit). |
+| `video_prompt` | Generates dynamic, cinematic physics-based instructions designed for Wan or consistent video tracking. |
+| `video_storyboard` | Shot-by-shot directorial sequences. |
 | `anima` | Unified merged output (tags + natural language) strictly tailored for the Anima diffusion model. |
+| `json_extract` | Extreme-detail structured JSON extraction. |
 
 ### Settings
 | Parameter | Default | Description |
@@ -48,13 +50,13 @@ Connect an **IMAGE** to the node and select a **mode**.
 | `mode` | `natural_language` | Select prompting architecture. |
 | `seed` | `0` | Lock the seed for deterministic outputs during prompt engineering. |
 | `keep_alive` | `0` | VRAM cache duration (in minutes, use `-1` for permanent). |
-| `thinking_mode` | `False` (Disabled) | **Enable** = Enable thinking. **Disable** = Disable thinking. Disabling speeds up generation by skipping reasoning tokens. |
+| `thinking_mode` | `False` (Disabled) | Toggles the native reasoning engine for supported models. Disabling skips the thinking phase (skips `<think>` generation) to radically speed up inference. |
 | `custom_prompt` | (Empty) | Override the built-in system prompt. Leave empty to use the selected mode preset. |
 | `keywords` | (Empty) | Append modifiers/instructions to the selected mode. |
 
 ### Outputs
 - `text`: Generated prompt/tags.
-- `thought_process`: (Optional) Latent reasoning from `<think>` models.
+- `thought_process`: (Optional) Latent reasoning trace natively extracted from thinking models (e.g., Qwen3.5, DeepSeek-R1).
 
 ---
 
