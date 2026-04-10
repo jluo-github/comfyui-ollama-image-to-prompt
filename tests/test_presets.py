@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from presets import (
+    DANBOORU_TAGS_PROMPT,
     DEFAULT_MODEL,
     DEFAULT_URL,
     NATURAL_LANGUAGE_PROMPT,
     OLLAMA_MODELS,
-    DANBOORU_TAGS_PROMPT,
 )
 
 

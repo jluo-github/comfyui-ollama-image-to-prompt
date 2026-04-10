@@ -82,7 +82,7 @@ class TestPromptSelection:
             image=self._make_batch(),
             ollama_url="http://localhost:11434",
             model="qwen3-vl:8b",
-            mode="tags",
+            mode="danbooru_tags",
             seed=42,
             keep_alive=5,
             thinking_mode=False,
@@ -104,7 +104,7 @@ class TestPromptSelection:
             image=self._make_batch(),
             ollama_url="http://localhost:11434",
             model="qwen3-vl:8b",
-            mode="tags",
+            mode="danbooru_tags",
             seed=0,
             keep_alive=5,
             thinking_mode=False,
@@ -138,7 +138,7 @@ class TestPromptSelection:
         call_args = mock_post.call_args[1]["json"]
         assert "User Keywords / Instructions:" in call_args["prompt"]
         assert "1girl, neon" in call_args["prompt"]
-        assert "Analyze this image and write a highly detailed" in call_args["prompt"]
+        assert "professional AI Visual Prompt Engineer" in call_args["prompt"]
 
 
 class TestThinkTagParsing:
