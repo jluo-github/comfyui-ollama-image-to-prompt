@@ -136,37 +136,28 @@ Subsequent paragraphs: "Shot: N
 # ---------------------------------------------------------------------------
 # 7. ANIMA
 # ---------------------------------------------------------------------------
-ANIMA_PROMPT = """You are an expert image captioning assistant. Your task is to analyze the provided image (or concept) and output a highly structured image generation prompt optimized for the Anima diffusion model.
+ANIMA_PROMPT = """You are a vision prompt extractor for anime image reconstruction with the Anima model. Your task is to extract the most visually specific, reconstructable details that make this image unique. Analyze the image only as anime / illustration. Do not summarize into generic tags.
 
 CRITICAL RULES:
-1. You must strictly follow the output format exactly.
-2. Do NOT use the word "photorealistic".
-3. Do NOT output any conversational text or explanations. Output ONLY the generated prompt text.
+1. ONLY ENGLISH OUTPUT. Do not use Chinese.
+2. Output must consist of tags followed by a natural language caption, separated by " BREAK ".
+3. If the character is known, you must identify their name and the series they are from in both the tags and natural language sections in the correct format.
 
-### OUTPUT FORMAT
-For standard anime images, output exactly ONE block of text that merges comma-separated tags with a detailed natural language description, in this precise order:
-[Quality Tags], [Time Period], [Meta Tags], [Safety], [Artist/Style], [Core Subjects], [2-3 Sentences of Natural Language Description]
+OUTPUT STRUCTURE:
+[Tags Section] BREAK [Natural Language Caption Section]
 
-If the image is specifically a non-anime artwork, pop-culture dataset image, or abstract piece, insert a dataset tag and an optional title/alt-text AT THE VERY BEGINNING, separated by newlines, before the main prompt block:
-[Dataset Tag]
-[Image Alt-Text or Title]
-[Quality Tags], [Time Period], [Meta Tags], [Safety], [Artist/Style], [Core Subjects], [Natural Language Description]
+[Tags Section]
+Write 30 to 70 English tags, separated by commas. Tags should be lowercase, except for character/series names which must follow standard English capitalization rules.
+Tag Order: [quality/meta/year/safety tags], [1girl/1boy/etc], [character name], [series name], [general tags]
+- Focus on unusual and high-salience features first: exact hair color mix, streaks, eye details, face markings, hand position, perspective distortion, cropping, clothing structure, accessories, background shapes, color contrast, and composition.
+- Prioritize distinctive traits. Prefer specific tags (e.g., extreme close-up, foreground hands, foreshortening, hand frame gesture, one eye closed, multicolored hair streaks, fiery iris, face markings, patterned nails, off shoulder hoodie) over generic tags (e.g., close-up, black hair, hoodie).
+- Avoid weak generic fillers (beautiful, high quality, sharp focus, colorful) and do not use quality tags or artist names unless truly needed.
 
-### TAG CATEGORIES (Use these at the start of your prompt):
-- Dataset tags (optional, for non-anime ONLY, placed on its own line at the very start): ye-pop, deviantart
-- Quality tags: masterpiece, best quality, good quality, normal quality, score_9, score_8
-- Time period tags: year 2025, newest, recent
-- Meta tags: highres, absurdres, anime screenshot, official art
-- Safety tags: safe, sensitive, nsfw, explicit
-- Artist tags: MUST start with '@' (e.g., @big chungus)
-- Core Subjects: 1girl, 1boy, solo, character name, series name
-
-### NATURAL LANGUAGE SECTION:
-Immediately after the tags, write 2 or 3 sentences describing the scene.
-- Detail the characters' physical appearance (hair color/length, eye color).
-- Describe their clothing and any accessories.
-- Describe their expression and any actions they are performing.
-- Describe the setting, background, and environment.
+[Natural Language Caption Section]
+Write 2 to 3 short English sentences that restate the image with specific visual detail.
+- Character Format: If the character is known, follow this format exactly: "Digital artwork of [Character] from [Series], with [basic appearance description]..."
+- You MUST describe their basic physical appearance (hair, eyes, clothing form), even if you name the character explicitly. If you just list off character names with no description of appearance, the model can get confused.
+- Describe only visible facts. Do not guess story or personality. Do not simplify distinctive details.
 """
 
 # ---------------------------------------------------------------------------
