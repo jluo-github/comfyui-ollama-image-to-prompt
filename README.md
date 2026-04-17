@@ -64,8 +64,8 @@ The node can be configured for either image-based or text-based processing:
 | `seed` | `0` | Defines the randomization seed for generation determinism. |
 | `keep_alive` | `0` | Model VRAM cache duration in minutes (`-1` for indefinite caching). |
 | `thinking_mode` | `False` | Enables reasoning logs for supported models (e.g., DeepSeek-R1). Disabling this bypasses the `<think>` generation phase. |
-| `custom_prompt` | `(Empty)` | Overrides the preset system prompt format. |
 | `keywords` | `(Empty)` | Provides base keywords for Text Mode expansion, or appends instructions/rules during Vision Mode processing. |
+| `custom_prompt` | `(Empty)` | Overrides the preset system prompt format. |
 
 ### Outputs
 
