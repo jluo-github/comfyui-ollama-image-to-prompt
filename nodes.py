@@ -51,7 +51,7 @@ class OllamaImageToPrompt:
                     {
                         "multiline": True,
                         "default": "",
-                        "placeholder": "Type keywords here for prompt expansion, or additional rules for image parsing.",
+                        "placeholder": "Type keywords for prompt expansion or rules for image parsing.",
                     },
                 ),
                 "custom_prompt": (

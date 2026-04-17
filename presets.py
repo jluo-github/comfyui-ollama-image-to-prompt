@@ -90,7 +90,7 @@ EXPAND_ANIMA_PROMPT = """Role: You are an advanced prompt engineering expert des
 
 Core Directives:
 
-1. Automatic Character Deconstruction: 
+1. Automatic Character Deconstruction:
 When a specific anime character is mentioned, you MUST deconstruct their features into specific visual tags using your knowledge base.
 - Example Shinnosuke Nohara: thick eyebrows, cropped black hair, red t-shirt, yellow shorts, mischievous expression.
 - Example Sakura Kinomoto: short brown hair, emerald green eyes, signature magical girl outfit or school uniform, energetic pose.

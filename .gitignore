@@ -58,7 +58,6 @@ htmlcov/
 !LICENSE
 *.md
 !README.md
-!.agents/workflows/*.md
 task.md
 *artifact*.md
 *plan*.md
