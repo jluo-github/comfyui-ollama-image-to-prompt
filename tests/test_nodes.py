@@ -13,9 +13,9 @@ class TestInputTypes:
         assert "required" in input_types
         assert "optional" in input_types
 
-    def test_required_has_image(self) -> None:
-        required = OllamaImageToPrompt.INPUT_TYPES()["required"]
-        assert "image" in required
+    def test_optional_has_image(self) -> None:
+        optional = OllamaImageToPrompt.INPUT_TYPES()["optional"]
+        assert "image" in optional
 
     def test_required_has_model(self) -> None:
         required = OllamaImageToPrompt.INPUT_TYPES()["required"]
@@ -59,14 +59,14 @@ class TestPromptSelection:
             image=self._make_batch(),
             ollama_url="http://localhost:11434",
             model="qwen3-vl:8b",
-            mode="natural_language",
+            mode="prompt",
             seed=42,
             keep_alive=5,
             thinking_mode=False,
         )
 
         assert len(texts) == 1
-        assert texts[0] == "A beautiful scene., BREAK,"
+        assert texts[0] == "A beautiful scene. BREAK "
         call_args = mock_post.call_args[1]["json"]
         assert "CRITICAL: Do NOT output any thinking process." in call_args["prompt"]
 
@@ -90,7 +90,7 @@ class TestPromptSelection:
 
         assert "tag1" in texts[0]
         assert "\n" not in texts[0]
-        assert texts[0].endswith(", BREAK,")
+        assert texts[0].endswith(" BREAK ")
 
     @patch("core.api.requests.post")
     def test_custom_prompt_overrides_mode(self, mock_post: MagicMock) -> None:
@@ -112,7 +112,7 @@ class TestPromptSelection:
         )
 
         # With custom_prompt, tags cleanup should NOT run
-        assert texts[0] == "custom output, BREAK,"
+        assert texts[0] == "custom output BREAK "
 
     @patch("core.api.requests.post")
     def test_keywords_appended_to_prompt(self, mock_post: MagicMock) -> None:
@@ -126,14 +126,14 @@ class TestPromptSelection:
             image=self._make_batch(),
             ollama_url="http://localhost:11434",
             model="qwen3-vl:8b",
-            mode="natural_language",
+            mode="prompt",
             seed=0,
             keep_alive=5,
             thinking_mode=False,
             keywords="1girl, neon",
         )
 
-        assert texts[0] == "expanded output, BREAK,"
+        assert texts[0] == "expanded output BREAK "
         # Verify the prompt sent to the API contains both instruction AND keywords
         call_args = mock_post.call_args[1]["json"]
         assert "User Keywords / Instructions:" in call_args["prompt"]
@@ -157,13 +157,13 @@ class TestThinkTagParsing:
             image=self._make_batch(),
             ollama_url="http://localhost:11434",
             model="qwen3-vl:8b",
-            mode="natural_language",
+            mode="prompt",
             seed=0,
             keep_alive=5,
             thinking_mode=True,
         )
 
-        assert texts[0] == "A girl with blue hair., BREAK,"
+        assert texts[0] == "A girl with blue hair. BREAK "
         assert thoughts[0] == "I need to analyze this."
         call_args = mock_post.call_args[1]["json"]
         assert "CRITICAL: Do NOT output any thinking process." not in call_args["prompt"]
@@ -180,13 +180,13 @@ class TestThinkTagParsing:
             image=self._make_batch(),
             ollama_url="http://localhost:11434",
             model="qwen3-vl:8b",
-            mode="natural_language",
+            mode="prompt",
             seed=0,
             keep_alive=5,
             thinking_mode=False,
         )
 
-        assert texts[0] == "Main output., BREAK,"
+        assert texts[0] == "Main output. BREAK "
         assert thoughts[0] == ""
 
 
@@ -204,7 +204,7 @@ class TestBatchProcessing:
             image=batch,
             ollama_url="http://localhost:11434",
             model="qwen3-vl:8b",
-            mode="natural_language",
+            mode="prompt",
             seed=0,
             keep_alive=5,
             thinking_mode=False,

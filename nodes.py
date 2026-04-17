@@ -23,16 +23,17 @@ except ImportError:
 
 
 class OllamaImageToPrompt:
-    """A ComfyUI Node for generating prompts from images using local Ollama vision models.
+    """A ComfyUI Node for generating prompts using local Ollama models.
 
     Supports generating detailed natural language descriptions and Danbooru-style tags.
+    If an image is provided, acts as a VLM (Vision-Language Model).
+    If no image is provided, acts as a pure text-based prompt expander.
     """
 
     @classmethod
     def INPUT_TYPES(cls) -> dict[str, dict[str, Any]]:
         return {
             "required": {
-                "image": ("IMAGE",),
                 "ollama_url": (
                     "STRING",
                     {"multiline": False, "default": DEFAULT_URL},
@@ -44,20 +45,21 @@ class OllamaImageToPrompt:
                 "thinking_mode": ("BOOLEAN", {"default": False}),
             },
             "optional": {
+                "image": ("IMAGE",),
+                "keywords": (
+                    "STRING",
+                    {
+                        "multiline": True,
+                        "default": "",
+                        "placeholder": "Type keywords here for prompt expansion, or additional rules for image parsing.",
+                    },
+                ),
                 "custom_prompt": (
                     "STRING",
                     {
                         "multiline": True,
                         "default": "",
                         "placeholder": "Optional: Override default system prompt. Leave empty to use 'mode'.",
-                    },
-                ),
-                "keywords": (
-                    "STRING",
-                    {
-                        "multiline": True,
-                        "default": "",
-                        "placeholder": "Optional: Keywords for 'expand' modes or additional rules.",
                     },
                 ),
             },
@@ -71,24 +73,25 @@ class OllamaImageToPrompt:
 
     def generate_prompt(
         self,
-        image: torch.Tensor,
         ollama_url: str,
         model: str,
         mode: str,
         seed: int,
         keep_alive: int,
         thinking_mode: bool,
+        image: torch.Tensor | None = None,
         custom_prompt: str = "",
         keywords: str = "",
     ) -> tuple[list[str], list[str]]:
-        """Generates prompts from input images via the Ollama API.
+        """Generates prompts from optional input images or text via the Ollama API.
 
-        Processes a batch of images and utilizes the `generate_ollama_completion` helper.
+        If 'image' is provided, it processes a batch of images.
+        If 'image' is None, it acts purely on the text/keywords provided.
 
         Returns:
             A tuple containing two lists:
-            - A list of generated prompt strings (one for each input image).
-            - A list of generated thought processes (one for each input image).
+            - A list of generated prompt strings.
+            - A list of generated thought processes.
         """
         # Initialize output lists
         generated_texts: list[str] = []
@@ -104,14 +107,31 @@ class OllamaImageToPrompt:
         if keywords and keywords.strip():
             final_prompt += f"\n\nUser Keywords / Instructions:\n{keywords.strip()}"
 
-        # Support batch processing
-        # ComfyUI passes images as (B, H, W, C)
-        for img_tensor in image:
+        if image is not None:
+            # Support batch processing
+            # ComfyUI passes images as (B, H, W, C)
+            for img_tensor in image:
+                generated_text, thought_process = generate_ollama_completion(
+                    ollama_url=ollama_url,
+                    model=model,
+                    final_prompt=final_prompt,
+                    img_tensor=img_tensor,
+                    mode=mode,
+                    seed=seed,
+                    keep_alive=keep_alive,
+                    thinking_mode=thinking_mode,
+                    custom_prompt=custom_prompt,
+                )
+
+                generated_texts.append(generated_text)
+                thought_processes.append(thought_process)
+        else:
+            # Text-only mode (no image)
             generated_text, thought_process = generate_ollama_completion(
                 ollama_url=ollama_url,
                 model=model,
                 final_prompt=final_prompt,
-                img_tensor=img_tensor,
+                img_tensor=None,
                 mode=mode,
                 seed=seed,
                 keep_alive=keep_alive,

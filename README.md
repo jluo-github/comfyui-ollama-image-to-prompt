@@ -1,6 +1,6 @@
 <div align="center">
-  <h1>✨ ComfyUI Ollama Image to Prompt</h1>
-  <p><strong>A custom ComfyUI node built to hook up local Ollama vision models for generating actually good prompts, Danbooru tags, and video motion instructions.</strong></p>
+  <h1>ComfyUI Ollama Image & Text to Prompt</h1>
+  <p><strong>A ComfyUI custom node that integrates local Ollama models for both Vision-Language (VLM) image analysis and text-based prompt expansion operations.</strong></p>
 
   [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
   [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
@@ -10,14 +10,21 @@
 
 ---
 
-## 🌟 Overview
-The **Ollama Image to Prompt** custom node is designed to run local Vision-Language Models (VLMs) like Qwen directly inside ComfyUI workflows. It automates vision-to-prompt pipelines, extracting detailed natural language, Danbooru tags, and video motion instructions using 9 specialized prompting architectures.
+## Overview
 
-![Ollama Image to Prompt Node](ollama-image-to-prompt-node.jpg)
+The **Ollama Image/Text to Prompt** node enables local Vision-Language Models (VLMs) and LLMs to run within ComfyUI workflows. It operates as a dual-purpose node:
 
-## 📦 Setup
-1. **Ollama**: [Download](https://ollama.com/) and pull a vision model (e.g., `qwen3.5:9b`).
-2. **Install**:
+- **Vision Mode:** Processes input images to produce natural language descriptions, Danbooru tags, or video motion instructions.
+- **Text Mode:** Processes input text keywords without an image to expand them into detailed prompts and tags.
+
+The node includes 9 distinct architectural presets for processing inputs.
+
+![Ollama Node Configuration](ollama-image-to-prompt-node.jpg)
+
+## Setup
+
+1. Install [Ollama](https://ollama.com/) locally and pull a required model (e.g., `qwen3.5:9b`).
+2. Clone the repository into your ComfyUI custom nodes directory:
    ```bash
    cd ComfyUI/custom_nodes/
    git clone https://github.com/jluo-github/comfyui-ollama-image-to-prompt.git
@@ -26,40 +33,47 @@ The **Ollama Image to Prompt** custom node is designed to run local Vision-Langu
    ```
 3. Restart ComfyUI.
 
-## 💡 Usage Configuration
-Connect an **IMAGE** to the node and select a **mode**.
+## Usage
 
-### Prompt Architectures
-| Mode | Description |
+The node can be configured for either image-based or text-based processing:
+- **Vision Setup (Image to Prompt):** Provide an input to the `image` interface and select a processing mode (e.g., `prompt`).
+- **Text Setup (Text to Prompt):** Leave the `image` interface disconnected, define input text via the `keywords` parameter, and select an expansion mode (e.g., `expand_prompt`).
+
+### Processing Modes
+
+| Mode | Function |
 | :--- | :--- |
-| `natural_language` | Dense, highly-descriptive, pixel-level prose extraction. Optimized for Flux, Qwen, Z-Image, etc. |
-| `danbooru_tags` | Pure subset of booru-style tags separated by commas. Optimized for NoobAI, Illustrious, etc. |
-| `expand_prompt` | Takes short user keywords and intelligently up-samples them into rich full-sentence prompts (handles portraits/scenes). |
-| `expand_tags` | Takes short user keywords and optimally expands them into dense, pixel-perfect Danbooru tags. |
-| `image_edit` | Structured instruction prompts for image-to-image edit models (e.g., Qwen-Image-Edit). |
-| `video_prompt` | Generates dynamic, cinematic physics-based instructions designed for Wan or consistent video tracking. |
-| `video_storyboard` | Shot-by-shot directorial sequences. |
-| `anima` | Unified merged output (tags + natural language) strictly tailored for the Anima diffusion model. |
-| `json_extract` | Extreme-detail structured JSON extraction. |
+| `prompt` | Extracts dense, highly-descriptive prose for models such as Flux or Qwen. |
+| `danbooru_tags` | Extracts comma-separated Booru-style tags, formatted for models like NoobAI or Illustrious. |
+| `anima` | Produces a unified tag and natural language output tailored for the Anima diffusion model. |
+| `expand_prompt` | Expands concise user keywords into rich, full-sentence prompts. |
+| `expand_tags` | Expands concise user keywords into dense Danbooru tag formats. |
+| `expand_anima` | Translates simple character names and keywords into deeply structured, 4-layer prompts specialized for the Anima model. |
+| `image_edit` | Generates structured editing instructions for image-to-image models. |
+| `video_prompt` | Generates physics-based, cinematic instructions for video generation models. |
+| `video_storyboard` | Generates shot-by-shot directorial sequences. |
+| `json_extract` | Extracts high-detail structured output configured as JSON. |
 
-### Settings
+### Configuration Parameters
+
 | Parameter | Default | Description |
 | :--- | :--- | :--- |
-| `ollama_url` | `http://localhost:11434` | Your local Ollama endpoint. |
-| `model` | `qwen3.5:9b` | Local vision model name. |
-| `mode` | `natural_language` | Select prompting architecture. |
-| `seed` | `0` | Lock the seed for deterministic outputs during prompt engineering. |
-| `keep_alive` | `0` | VRAM cache duration (in minutes, use `-1` for permanent). |
-| `thinking_mode` | `False` (Disabled) | Toggles the native reasoning engine for supported models. Disabling skips the thinking phase (skips `<think>` generation) to radically speed up inference. |
-| `custom_prompt` | (Empty) | Override the built-in system prompt. Leave empty to use the selected mode preset. |
-| `keywords` | (Empty) | Append modifiers/instructions to the selected mode. |
+| `ollama_url` | `http://localhost:11434` | The endpoint URL for the local Ollama service. |
+| `model` | `qwen3.5:9b` | The local vision or language model to execute. |
+| `mode` | `prompt` | The architectural preset to use for processing. |
+| `seed` | `0` | Defines the randomization seed for generation determinism. |
+| `keep_alive` | `0` | Model VRAM cache duration in minutes (`-1` for indefinite caching). |
+| `thinking_mode` | `False` | Enables reasoning logs for supported models (e.g., DeepSeek-R1). Disabling this bypasses the `<think>` generation phase. |
+| `custom_prompt` | `(Empty)` | Overrides the preset system prompt format. |
+| `keywords` | `(Empty)` | Provides base keywords for Text Mode expansion, or appends instructions/rules during Vision Mode processing. |
 
 ### Outputs
-- `text`: Generated prompt/tags.
-- `thought_process`: (Optional) Latent reasoning trace natively extracted from thinking models (e.g., Qwen3.5, DeepSeek-R1).
+
+- `text` *(STRING)*: The generated prompt or formatted tag output.
+- `thought_process` *(STRING)*: The captured latent reasoning trace if `thinking_mode` is enabled for compatible models.
 
 ---
 
 <div align="center">
-    Made with ❤️ for the ComfyUI community
+    Distributed under the MIT License.
 </div>

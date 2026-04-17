@@ -15,21 +15,24 @@ def generate_ollama_completion(
     ollama_url: str,
     model: str,
     final_prompt: str,
-    img_tensor: Any,  # Expected to be a torch.Tensor
-    mode: str,
-    seed: int,
-    keep_alive: int,
-    thinking_mode: bool,
+    img_tensor: Any | None = None,  # None for text-only mode
+    mode: str = "prompt",
+    seed: int = 0,
+    keep_alive: int = 0,
+    thinking_mode: bool = False,
     custom_prompt: str = "",
 ) -> tuple[str, str]:
-    """Sends a request to the Ollama API to generate a text completion from an image.
+    """Sends a request to the Ollama API to generate a text completion.
+
+    Supports both image-to-prompt (when img_tensor is provided) and text-only
+    prompt expansion (when img_tensor is None).
 
     Args:
         ollama_url: The base URL of the Ollama instance (e.g., "http://localhost:11434").
-        model: The name of the vision model to use (e.g., "qwen3.5-vl").
+        model: The name of the model to use.
         final_prompt: The complete prompt to send to the model.
-        img_tensor: A PyTorch tensor representing the image.
-        mode: The generation mode ("natural_language" or "tags").
+        img_tensor: An optional PyTorch tensor representing an image. If None, runs in text-only mode.
+        mode: The generation mode (e.g., "prompt", "expand_prompt", "expand_tags").
         seed: The random seed for generation to ensure reproducibility.
         keep_alive: The duration (in minutes) to keep the model loaded in memory, or -1 for indefinite.
         thinking_mode: Whether to parse and extract the model's `<think>` output block.
@@ -40,8 +43,6 @@ def generate_ollama_completion(
         `<think>` block is found, `thought_process` will be an empty string. On error, both strings
         will contain error descriptions.
     """
-    img_b64 = tensor_to_base64(img_tensor)
-
     if not thinking_mode:
         final_prompt += (
             "\n\nCRITICAL: Do NOT output any thinking process. "
@@ -52,13 +53,17 @@ def generate_ollama_completion(
     payload = {
         "model": model,
         "prompt": final_prompt,
-        "images": [img_b64],
         "stream": False,
         "think": thinking_mode,
         "options": {
             "seed": seed,
         },
     }
+
+    # Only include images when an image tensor is provided
+    if img_tensor is not None:
+        img_b64 = tensor_to_base64(img_tensor)
+        payload["images"] = [img_b64]
 
     if keep_alive == -1:
         payload["keep_alive"] = -1  # Indefinite
@@ -105,7 +110,7 @@ def generate_ollama_completion(
             else:
                 generated_text = generated_text.strip()
         else:
-            generated_text = f"{generated_text.rstrip(', ')}, BREAK,"
+            generated_text = f"{generated_text.rstrip(', ')} BREAK "
 
         return generated_text, thought_process
 
