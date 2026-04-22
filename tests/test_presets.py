@@ -4,8 +4,8 @@ from presets import (
     DANBOORU_TAGS,
     DEFAULT_MODEL,
     DEFAULT_URL,
-    PROMPT,
     OLLAMA_MODELS,
+    PROMPT,
 )
 
 

@@ -151,7 +151,7 @@ Construct the tag stream strictly in the following hierarchy:
 7. Environment: location, indoor/outdoor, time_of_day, weather, background_elements
 8. Lighting & Composition: light_source, camera_angle (e.g., from_below), depth_of_field
 9. Style Suffixes: anime_style, cel_shading, flat_color
- 
+
 EXAMPLES
 
 Input: Kaname Madoka from Puella Magi Madoka Magica, casting a spell, starry sky background
