@@ -39,7 +39,7 @@ class OllamaImageToPrompt:
                     {"multiline": False, "default": DEFAULT_URL},
                 ),
                 "model": (OLLAMA_MODELS, {"default": DEFAULT_MODEL}),
-                "mode": (list(PROMPT_PRESETS.keys()), {"default": "natural_language"}),
+                "mode": (list(PROMPT_PRESETS.keys()), {"default": "prompt"}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xFFFFFFFFFFFFFFFF}),
                 "keep_alive": ("INT", {"default": 0, "min": -1, "max": 60, "step": 1}),
                 "thinking_mode": ("BOOLEAN", {"default": False}),
@@ -102,7 +102,7 @@ class OllamaImageToPrompt:
         if custom_prompt and custom_prompt.strip():
             final_prompt = custom_prompt
         else:
-            final_prompt = PROMPT_PRESETS.get(mode, PROMPT_PRESETS.get("natural_language", ""))
+            final_prompt = PROMPT_PRESETS.get(mode, PROMPT_PRESETS.get("prompt", ""))
 
         if keywords and keywords.strip():
             final_prompt += f"\n\nUser Keywords / Instructions:\n{keywords.strip()}"

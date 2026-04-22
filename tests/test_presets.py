@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from presets import (
-    DANBOORU_TAGS_PROMPT,
+    DANBOORU_TAGS,
     DEFAULT_MODEL,
     DEFAULT_URL,
-    NATURAL_LANGUAGE_PROMPT,
+    PROMPT,
     OLLAMA_MODELS,
 )
 
@@ -20,16 +20,16 @@ class TestPresets:
         assert DEFAULT_URL.startswith("http")
 
     def test_danbooru_tags_prompt_is_non_empty(self) -> None:
-        assert isinstance(DANBOORU_TAGS_PROMPT, str)
-        assert len(DANBOORU_TAGS_PROMPT) > 50
+        assert isinstance(DANBOORU_TAGS, str)
+        assert len(DANBOORU_TAGS) > 50
 
     def test_prompt_prompt_is_non_empty(self) -> None:
-        assert isinstance(NATURAL_LANGUAGE_PROMPT, str)
-        assert len(NATURAL_LANGUAGE_PROMPT) > 50
+        assert isinstance(PROMPT, str)
+        assert len(PROMPT) > 50
 
     def test_danbooru_tags_prompt_is_valid(self) -> None:
         # Just test it's a valid string since wording might change
-        assert isinstance(DANBOORU_TAGS_PROMPT, str)
+        assert isinstance(DANBOORU_TAGS, str)
 
     def test_prompt_prompt_mentions_expression(self) -> None:
-        assert "expression" in NATURAL_LANGUAGE_PROMPT.lower()
+        assert "expression" in PROMPT.lower()

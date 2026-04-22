@@ -17,7 +17,7 @@ The **Ollama Image/Text to Prompt** node enables local Vision-Language Models (V
 - **Vision Mode:** Processes input images to produce natural language descriptions, Danbooru tags, or video motion instructions.
 - **Text Mode:** Processes input text keywords without an image to expand them into detailed prompts and tags.
 
-The node includes 9 distinct architectural presets for processing inputs.
+The node includes 10 distinct architectural presets for processing inputs.
 
 ![Ollama Node Configuration](ollama-image-to-prompt-node.jpg)
 
@@ -58,12 +58,12 @@ The node can be configured for either image-based or text-based processing:
 
 | Parameter | Default | Description |
 | :--- | :--- | :--- |
-| `ollama_url` | `http://localhost:11434` | The endpoint URL for the local Ollama service. |
+| `ollama_url` | `http://localhost:11434` | The endpoint URL for the local Ollama instance. |
 | `model` | `qwen3.5:9b` | The local vision or language model to execute. |
 | `mode` | `prompt` | The architectural preset to use for processing. |
 | `seed` | `0` | Defines the randomization seed for generation determinism. |
 | `keep_alive` | `0` | Model VRAM cache duration in minutes (`-1` for indefinite caching). |
-| `thinking_mode` | `False` | Enables reasoning logs for supported models (e.g., DeepSeek-R1). Disabling this bypasses the `<think>` generation phase. |
+| `thinking_mode` | `False` | Enables reasoning logs for supported models. Disabling this bypasses the `<think>` generation phase. |
 | `keywords` | `(Empty)` | Provides base keywords for Text Mode expansion, or appends instructions/rules during Vision Mode processing. |
 | `custom_prompt` | `(Empty)` | Overrides the preset system prompt format. |
 
@@ -73,7 +73,10 @@ The node can be configured for either image-based or text-based processing:
 - `thought_process` *(STRING)*: The captured latent reasoning trace if `thinking_mode` is enabled for compatible models.
 
 ---
+## License
 
-<div align="center">
-    Distributed under the MIT License.
-</div>
+[MIT License](LICENSE)
+
+---
+
+Made with ❤️ for the ComfyUI community
