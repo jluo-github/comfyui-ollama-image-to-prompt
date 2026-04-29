@@ -45,10 +45,10 @@ The node can be configured for either image-based or text-based processing:
 | :--- | :--- |
 | `prompt` | Extracts dense, highly-descriptive prose for models such as Flux or Qwen. |
 | `danbooru_tags` | Extracts comma-separated Booru-style tags, formatted for models like NoobAI or Illustrious. |
-| `anima` | Produces a unified tag and natural language output tailored for the Anima diffusion model. |
+| `anima` | Extracts character identities and visual features into stylized Anima prompts. |
 | `expand_prompt` | Expands concise user keywords into rich, full-sentence prompts. |
 | `expand_tags` | Expands concise user keywords into dense Danbooru tag formats. |
-| `expand_anima` | Translates simple character names and keywords into deeply structured, 4-layer prompts specialized for the Anima model. |
+| `expand_anima` | Expands user keywords to modify extracted image features into stylized Anima prompts. |
 | `image_edit` | Generates structured editing instructions for image-to-image models. |
 | `video_prompt` | Generates physics-based, cinematic instructions for video generation models. |
 | `video_storyboard` | Generates shot-by-shot directorial sequences. |
@@ -59,7 +59,7 @@ The node can be configured for either image-based or text-based processing:
 | Parameter | Default | Description |
 | :--- | :--- | :--- |
 | `ollama_url` | `http://localhost:11434` | The endpoint URL for the local Ollama instance. |
-| `model` | `qwen3.5:9b` | The local vision or language model to execute. |
+| `model` | `qwen3.5:9b` | The local vision or language model to execute. Options: `qwen3.5:9b`, `qwen3.5:4b`, `qwen3-vl:8b`, `qwen3-vl:4b`, `gemma4:e4b`, `gemma4:e2b`. |
 | `mode` | `prompt` | The architectural preset to use for processing. |
 | `seed` | `0` | Defines the randomization seed for generation determinism. |
 | `keep_alive` | `0` | Model VRAM cache duration in minutes (`-1` for indefinite caching). |
