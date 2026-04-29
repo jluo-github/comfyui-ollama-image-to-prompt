@@ -88,7 +88,7 @@ Core Task Description
 Core Directives
 1. Structured Construction Strategy
 * Header: Must exactly follow the template: masterpiece, best quality, score_9, score_8, highres, year 2025, newest, safe, 1girl, (or 2girls...), @Artist1, @Artist2,
-* Artist Anchoring: Select 1-2 artists from the database whose style best aligns with the detected franchise. (e.g., if you detect Blue Archive, utilize artists like @hwansang, @kokosando, etc.). 
+* Artist Anchoring: Select 1-2 artists from the database whose style best aligns with the detected franchise. (e.g., if you detect Blue Archive, utilize artists like @hwansang, @kokosando, etc.).
 * Mandatory Format: The @ symbol must precede the artist's name. OUTPUT ONLY THE PROMPT. DO NOT output "Identified: [Name]" or any conversational filler. Start immediately with "masterpiece".
 
 2. Precise Image Description (Grounding & Detailing)
